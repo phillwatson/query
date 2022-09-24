@@ -22,7 +22,6 @@
  */
 package com.hillayes.query.filter;
 
-import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.util.Strings;
 import com.hillayes.query.filter.exceptions.FilterComparisonException;
 import com.hillayes.query.filter.exceptions.FilterException;
@@ -31,8 +30,6 @@ import com.hillayes.query.filter.exceptions.InvalidComparisonException;
 import com.hillayes.query.filter.exceptions.InvalidOrderByColException;
 import com.hillayes.query.filter.exceptions.OrderByConstructException;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
-import com.hillayes.query.filter.introspection.Introspection;
-import com.hillayes.query.filter.introspection.PropertyIntrospector;
 import com.hillayes.query.filter.parser.FilterParser;
 import com.hillayes.query.filter.parser.ParseException;
 import com.hillayes.query.filter.parser.TokenMgrError;
@@ -50,7 +47,7 @@ import java.util.List;
  * @since 1.0.0
  */
 public class QueryConstraints {
-    private final Class<?> dataClass;
+    private final QueryContext context;
 
     private Number skip;
 
@@ -61,14 +58,14 @@ public class QueryConstraints {
     private String filter;
 
     /**
-     * Constructs a QueryConstraints that applies constraints on the given REST data class. The
-     * properties of the REST data class are mapped to the underlying SQL query using the property
-     * mappings provided.
+     * Constructs a QueryConstraints that applies constraints on the given QueryContext. The
+     * properties of the class to be queries are mapped to the underlying SQL query using the
+     * property mappings provided by the context.
      *
-     * @param aRestDataClass the REST data class (with FilterProperty annotations).
+     * @param aContext the context describing the data class.
      */
-    public QueryConstraints(Class<?> aRestDataClass) {
-        dataClass = aRestDataClass;
+    public QueryConstraints(QueryContext aContext) {
+        context = aContext;
     }
 
     /**
@@ -229,12 +226,6 @@ public class QueryConstraints {
         throws SQLException, UnsupportedDataTypeException, IntrospectionException {
         StringBuilder sql = new StringBuilder(aProjection);
 
-        QueryContext context = null;
-        if ((filter != null) || (orderBy != null)) {
-            Introspection introspection = PropertyIntrospector.introspect(dataClass);
-            context = new DataClassQueryContext(introspection);
-        }
-
         if (filter != null) {
             try {
                 FilterParser.parse(context, filter);
@@ -277,12 +268,15 @@ public class QueryConstraints {
 
     @Override
     public String toString() {
-        return "QueryConstraints [dataClass=" + dataClass.getName() + ", skip=" + skip + ", top=" + top + ", orderBy="
-            + orderBy + ", filter=" + filter + "]";
+        return "QueryConstraints [dataClass=" + context.getClassName()
+            + ", skip=" + skip
+            + ", top=" + top
+            + ", orderBy=" + orderBy
+            + ", filter=" + filter + "]";
     }
 
     /**
-     * Encapsulates an element within a $orderby clause. Each element names a propName on which to
+     * Encapsulates an element within an $orderby clause. Each element names a propName on which to
      * sort the data and the order in which that propName should be sorted (asc or desc).
      */
     public static class OrderByCol {
@@ -292,7 +286,7 @@ public class QueryConstraints {
         final boolean ascending;
 
         /**
-         * A factor method to parse a single element of a $orderby clause. Examples would be "name
+         * A factor method to parse a single element of an $orderby clause. Examples would be "name
          * desc" or "lastModified asc"; where the "desc" and "asc" are optional.
          * <p>
          * If the given String is <code>null</code> (or empty), the return value will be

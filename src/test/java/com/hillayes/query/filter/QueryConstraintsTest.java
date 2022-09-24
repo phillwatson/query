@@ -26,6 +26,7 @@ import com.hillayes.query.filter.exceptions.FilterExprException;
 import com.hillayes.query.filter.exceptions.InvalidOrderByColException;
 import com.hillayes.query.filter.exceptions.InvalidPropertyRefException;
 import com.hillayes.query.filter.exceptions.OrderByConstructException;
+import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.introspection.FilterProperty;
 import org.junit.jupiter.api.Test;
 
@@ -51,20 +52,20 @@ import static org.mockito.Mockito.when;
 public class QueryConstraintsTest {
     @Test
     public void testConstructor() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
         assertNotNull(fixture);
     }
 
     @Test
     public void testisEmpty() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertTrue(fixture.isEmpty());
     }
 
     @Test
     public void testSetSkip() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getSkip());
         fixture.setSkip(10);
@@ -76,7 +77,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testSetSkipNegative() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getSkip());
         fixture.setSkip(-10);
@@ -87,7 +88,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testSetTop() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getTop());
         fixture.setTop(10);
@@ -99,7 +100,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testSetTopNegative() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getTop());
         fixture.setTop(-10);
@@ -110,7 +111,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testSetOrderEmpty() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("");
@@ -121,7 +122,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testSetOrderNull() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy(null);
@@ -132,7 +133,7 @@ public class QueryConstraintsTest {
 
     @Test
     public void testFilter() throws Exception {
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         String expr = "propertyA EQ 'abc'";
         fixture.setFilter(expr);
@@ -147,7 +148,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         fixture.setFilter("propertyA EQ 'abc' and propertyX EQ 'abc' or propertyB EQ 'abc'");
         try {
@@ -165,7 +166,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         String expr = "propertyA EQ 'abc' and propertyC EQ or propertyB EQ 'abc'";
         fixture.setFilter(expr);
@@ -184,7 +185,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         String expr = "propertyA EQ 'abc' or propertyB EQ 10";
 
@@ -201,7 +202,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         fixture.setSkip(10);
         assertNotNull(fixture.prepareStatement(mockConnection, "select x, y from table"));
@@ -216,7 +217,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         fixture.setTop(10);
         assertNotNull(fixture.prepareStatement(mockConnection, "select x, y from table"));
@@ -231,7 +232,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA asc, propertyB desc, propertyC asc");
@@ -250,7 +251,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA");
@@ -269,7 +270,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA asc, , propertyB desc");
@@ -288,7 +289,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA asc, propertyB desc, propertyC asc");
@@ -307,7 +308,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA asc, propertyX desc, propertyC asc");
@@ -329,7 +330,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA asc asc");
@@ -351,7 +352,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         assertNull(fixture.getOrderBy());
         fixture.setOrderBy("propertyA backward");
@@ -373,7 +374,7 @@ public class QueryConstraintsTest {
         Connection mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
+        QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         String expr = "propertyA EQ 'abc' or propertyB EQ 10";
 

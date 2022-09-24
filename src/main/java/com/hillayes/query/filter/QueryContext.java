@@ -34,6 +34,11 @@ import java.sql.SQLException;
  */
 public interface QueryContext {
     /**
+     * Returns the name of the class for which the query is to be created.
+     */
+    String getClassName();
+
+    /**
      * Returns the introspection info for the named property.
      *
      * @param aName the property whose info is requested.

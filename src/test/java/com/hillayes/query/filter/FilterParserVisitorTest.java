@@ -281,7 +281,12 @@ public class FilterParserVisitorTest
      */
     private class MockQueryContext implements QueryContext
     {
-        private StringBuilder query = new StringBuilder();
+        private final StringBuilder query = new StringBuilder();
+
+        @Override
+        public String getClassName() {
+            return "mock";
+        }
 
         @Override
         public Predicate newPredicate()

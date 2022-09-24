@@ -26,6 +26,7 @@ import com.hillayes.query.filter.Predicate;
 import com.hillayes.query.filter.Property;
 import com.hillayes.query.filter.QueryContext;
 
+import java.beans.IntrospectionException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,7 +39,9 @@ import java.util.ArrayList;
  * @since 1.0.0
  */
 public class DataClassQueryContext implements QueryContext {
-    private final Introspection dataClass;
+    private final Class<?> dataClass;
+
+    private final Introspection introspection;
 
     private final StringBuilder query = new StringBuilder();
 
@@ -48,8 +51,14 @@ public class DataClassQueryContext implements QueryContext {
      * Constructs a QueryContext that uses the introspection of the given data class as the basis
      * for validation of the property names within a filter query.
      */
-    public DataClassQueryContext(Introspection aDataClass) {
+    public DataClassQueryContext(Class<?> aDataClass) throws IntrospectionException {
         dataClass = aDataClass;
+        introspection = PropertyIntrospector.introspect(aDataClass);
+    }
+
+    @Override
+    public String getClassName() {
+        return dataClass.getName();
     }
 
     /**
@@ -60,7 +69,7 @@ public class DataClassQueryContext implements QueryContext {
      */
     @Override
     public Property getPropertyFor(String aName) {
-        return dataClass.getProperty(aName);
+        return introspection.getProperty(aName);
     }
 
     @Override

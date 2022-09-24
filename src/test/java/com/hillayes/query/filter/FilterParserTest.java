@@ -568,6 +568,11 @@ public class FilterParserTest {
 
         private final ArrayList<Predicate> comparisons = new ArrayList<>();
 
+        @Override
+        public String getClassName() {
+            return "mock";
+        }
+
         public List<Predicate> getComparisons() {
             return comparisons;
         }

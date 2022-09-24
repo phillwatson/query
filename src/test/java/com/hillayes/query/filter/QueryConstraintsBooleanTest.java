@@ -22,7 +22,10 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.introspection.FilterProperty;
+import com.hillayes.query.filter.introspection.Introspection;
+import com.hillayes.query.filter.introspection.PropertyIntrospector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +61,7 @@ public class QueryConstraintsBooleanTest
         mockConnection = mock(Connection.class);
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockStatement);
 
-        fixture = new QueryConstraints(TestDataClass.class);
+        fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
     }
 
     @Test
