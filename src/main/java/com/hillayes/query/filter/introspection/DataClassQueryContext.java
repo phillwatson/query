@@ -39,8 +39,6 @@ import java.util.ArrayList;
  * @since 1.0.0
  */
 public class DataClassQueryContext implements QueryContext {
-    private final Class<?> dataClass;
-
     private final Introspection introspection;
 
     private final StringBuilder query = new StringBuilder();
@@ -52,13 +50,12 @@ public class DataClassQueryContext implements QueryContext {
      * for validation of the property names within a filter query.
      */
     public DataClassQueryContext(Class<?> aDataClass) throws IntrospectionException {
-        dataClass = aDataClass;
         introspection = PropertyIntrospector.introspect(aDataClass);
     }
 
     @Override
     public String getClassName() {
-        return dataClass.getName();
+        return introspection.getDataClass().getName();
     }
 
     /**

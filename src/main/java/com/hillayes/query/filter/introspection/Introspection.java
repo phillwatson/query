@@ -162,6 +162,13 @@ public class Introspection {
     }
 
     /**
+     * Returns the class for which this is the introspection.
+     */
+    public Class<?> getDataClass() {
+        return dataClass;
+    }
+
+    /**
      * Returns an unmodifiable collection of the properties derived from the introspected data
      * class.
      */
