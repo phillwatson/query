@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -37,9 +37,8 @@ import java.sql.SQLException;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class Predicate
-{
-    private QueryContext context;
+public class Predicate {
+    private final QueryContext context;
 
     private Property property;
 
@@ -53,8 +52,7 @@ public class Predicate
 
     private boolean isNumeric;
 
-    public Predicate(QueryContext aContext)
-    {
+    public Predicate(QueryContext aContext) {
         context = aContext;
     }
 
@@ -63,8 +61,7 @@ public class Predicate
      *
      * @return any function that was referenced in the comparison.
      */
-    public FilterFunction getFunction()
-    {
+    public FilterFunction getFunction() {
         return function;
     }
 
@@ -73,8 +70,7 @@ public class Predicate
      *
      * @param aValue the function to be set.
      */
-    public void setFunction(FilterFunction aValue)
-    {
+    public void setFunction(FilterFunction aValue) {
         function = aValue;
     }
 
@@ -83,8 +79,7 @@ public class Predicate
      *
      * @return the name of the property referenced in the expression.
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
@@ -95,13 +90,11 @@ public class Predicate
      * @param aValue the name of the property referenced in the expression.
      * @throws InvalidPropertyRefException if the named property cannot be used in a filter.
      */
-    public void setName(String aValue)
-    {
+    public void setName(String aValue) {
         name = aValue;
 
         property = context.getPropertyFor(name);
-        if (property == null)
-        {
+        if (property == null) {
             throw new InvalidPropertyRefException(name);
         }
     }
@@ -111,8 +104,7 @@ public class Predicate
      *
      * @return the comparison operator referenced in the expression.
      */
-    public Operator getOperator()
-    {
+    public Operator getOperator() {
         return operator;
     }
 
@@ -122,8 +114,7 @@ public class Predicate
      *
      * @param aValue the comparison operator referenced in the expression.
      */
-    public void setOperator(Operator aValue)
-    {
+    public void setOperator(Operator aValue) {
         operator = aValue;
     }
 
@@ -137,11 +128,9 @@ public class Predicate
      *
      * @param aValue the identifier name.
      */
-    public void setIdentifier(String aValue)
-    {
+    public void setIdentifier(String aValue) {
         value = aValue.trim();
-        if ("null".equals(value))
-        {
+        if ("null".equals(value)) {
             value = null;
         }
         isNumeric = false;
@@ -154,13 +143,11 @@ public class Predicate
      *
      * @param aValue the quoted string value.
      */
-    public void setString(String aValue)
-    {
+    public void setString(String aValue) {
         value = aValue.trim();
 
         char char1 = value.charAt(0);
-        if ((char1 == '\'') || (char1 == '"'))
-        {
+        if ((char1 == '\'') || (char1 == '"')) {
             int len = value.length();
             value = value.substring(1).substring(0, len - 2);
         }
@@ -173,21 +160,19 @@ public class Predicate
      *
      * @param aValue the numeric value (in string form).
      */
-    public void setNumber(String aValue)
-    {
+    public void setNumber(String aValue) {
         value = aValue.trim();
         isNumeric = true;
     }
 
     /**
      * Returns the value used in the comparison expression - the right-hand-side of the comparison.
-     * This will be any of the {@link #setString() String}, {@link #setIdentifier(String)
+     * This will be any of the {@link #setString(String) String}, {@link #setIdentifier(String)
      * Identifier} or {@link #setNumber(String) Number} values set be the FilterParser.
      *
      * @return the value used in the comparison expression.
      */
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
@@ -197,20 +182,17 @@ public class Predicate
      *
      * @return <code>true</code> if the value is a numeric constant.
      */
-    public boolean isNumeric()
-    {
+    public boolean isNumeric() {
         return isNumeric;
     }
 
     /**
-     * Tests whether the given Predicate is a valid comparison. For example, it may ensure that the
+     * Tests whether the Predicate is a valid comparison. For example, it may ensure that the
      * name identifies a known property and that the value is compatible with the property's type.
      *
-     * @param aComparison the Predicate to be validated.
-     * @return <code>true</code> if the given Predicate is valid. Otherwise <code>false</code>.
+     * @return <code>true</code> if the Predicate is valid. Otherwise <code>false</code>.
      */
-    public boolean isValid()
-    {
+    public boolean isValid() {
         return true;
     }
 
@@ -227,11 +209,9 @@ public class Predicate
      * statement; if a database access error occurs or this method is called on a closed
      * PreparedStatement
      */
-    public int applyArg(PreparedStatement aStatement, int aArgIndex) throws SQLException
-    {
-        // if the expresion references a value
-        if ((operator != null) || ((function != null) && (function.takesValue())))
-        {
+    public int applyArg(PreparedStatement aStatement, int aArgIndex) throws SQLException {
+        // if the expression references a value
+        if ((operator != null) || ((function != null) && (function.takesValue()))) {
             // apply the formatted property value to the statement
             property.applyTo(aStatement, aArgIndex++, (function != null) ? function.formatValue(value) : value);
         }
@@ -242,19 +222,14 @@ public class Predicate
     /**
      * Adds the predicate expression to the given SQL query string.
      */
-    public void appendTo(StringBuilder aQuery)
-    {
-        if (function != null)
-        {
+    public void appendTo(StringBuilder aQuery) {
+        if (function != null) {
             function.appendTo(aQuery, property.getColName());
-        }
-        else
-        {
+        } else {
             aQuery.append(property.getColName());
         }
 
-        if (operator != null)
-        {
+        if (operator != null) {
             aQuery.append(' ').append(operator.getMnemonic()).append(" ?");
         }
     }
@@ -265,8 +240,7 @@ public class Predicate
      * @see Object#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder result = new StringBuilder();
         appendTo(result);
 

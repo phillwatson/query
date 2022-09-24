@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -47,26 +47,22 @@ import static org.mockito.Mockito.when;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class QueryConstraintsTest
-{
+public class QueryConstraintsTest {
     @Test
-    public void testConstructor() throws Exception
-    {
+    public void testConstructor() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
         assertNotNull(fixture);
     }
 
     @Test
-    public void testisEmpty() throws Exception
-    {
+    public void testisEmpty() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertTrue(fixture.isEmpty());
     }
 
     @Test
-    public void testSetSkip() throws Exception
-    {
+    public void testSetSkip() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getSkip());
@@ -78,8 +74,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testSetSkipNegative() throws Exception
-    {
+    public void testSetSkipNegative() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getSkip());
@@ -90,8 +85,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testSetTop() throws Exception
-    {
+    public void testSetTop() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getTop());
@@ -103,8 +97,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testSetTopNegative() throws Exception
-    {
+    public void testSetTopNegative() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getTop());
@@ -115,8 +108,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testSetOrderEmpty() throws Exception
-    {
+    public void testSetOrderEmpty() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getOrderBy());
@@ -127,8 +119,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testSetOrderNull() throws Exception
-    {
+    public void testSetOrderNull() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         assertNull(fixture.getOrderBy());
@@ -139,8 +130,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testFilter() throws Exception
-    {
+    public void testFilter() throws Exception {
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         String expr = "propertyA EQ 'abc'";
@@ -150,8 +140,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testFilterInvalidProp() throws Exception
-    {
+    public void testFilterInvalidProp() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -160,20 +149,16 @@ public class QueryConstraintsTest
         QueryConstraints fixture = new QueryConstraints(TestDataClass.class);
 
         fixture.setFilter("propertyA EQ 'abc' and propertyX EQ 'abc' or propertyB EQ 'abc'");
-        try
-        {
+        try {
             fixture.prepareStatement(mockConnection, "select x from table");
             fail("Expected InvalidPropertyRefException");
-        }
-        catch (InvalidPropertyRefException expected)
-        {
+        } catch (InvalidPropertyRefException expected) {
             assertEquals("propertyX", expected.getPropertyName());
         }
     }
 
     @Test
-    public void testFilterParseException() throws Exception
-    {
+    public void testFilterParseException() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -183,20 +168,16 @@ public class QueryConstraintsTest
 
         String expr = "propertyA EQ 'abc' and propertyC EQ or propertyB EQ 'abc'";
         fixture.setFilter(expr);
-        try
-        {
+        try {
             fixture.prepareStatement(mockConnection, "select x from table");
             fail("Expected FilterExprException");
-        }
-        catch (FilterExprException expected)
-        {
+        } catch (FilterExprException expected) {
             assertEquals(expr, expected.getFilterExpr());
         }
     }
 
     @Test
-    public void testPrepareStatementFilter() throws Exception
-    {
+    public void testPrepareStatementFilter() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -213,8 +194,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementSkip() throws Exception
-    {
+    public void testPrepareStatementSkip() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -229,8 +209,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementTop() throws Exception
-    {
+    public void testPrepareStatementTop() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -245,8 +224,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementOrderBy() throws Exception
-    {
+    public void testPrepareStatementOrderBy() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -265,8 +243,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementOrderByDefaultOrder() throws Exception
-    {
+    public void testPrepareStatementOrderByDefaultOrder() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -285,8 +262,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementOrderByEmptyElement() throws Exception
-    {
+    public void testPrepareStatementOrderByEmptyElement() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -305,8 +281,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementOrderByMultiple() throws Exception
-    {
+    public void testPrepareStatementOrderByMultiple() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -325,8 +300,7 @@ public class QueryConstraintsTest
     }
 
     @Test
-    public void testPrepareStatementOrderByInvalidProp() throws Exception
-    {
+    public void testPrepareStatementOrderByInvalidProp() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -339,20 +313,16 @@ public class QueryConstraintsTest
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try
-        {
+        try {
             fixture.prepareStatement(mockConnection, "select x, y from table");
             fail("Expected InvalidOrderByColException");
-        }
-        catch (InvalidOrderByColException expected)
-        {
+        } catch (InvalidOrderByColException expected) {
             assertEquals("propertyX", expected.getInvalidColumn());
         }
     }
 
     @Test
-    public void testPrepareStatementOrderByInvalidConstruct() throws Exception
-    {
+    public void testPrepareStatementOrderByInvalidConstruct() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -365,20 +335,16 @@ public class QueryConstraintsTest
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try
-        {
+        try {
             fixture.prepareStatement(mockConnection, "select x, y from table");
             fail("Expected OrderByConstructException");
-        }
-        catch (OrderByConstructException expected)
-        {
+        } catch (OrderByConstructException expected) {
             assertEquals("propertyA asc asc", expected.getOrderBy());
         }
     }
 
     @Test
-    public void testPrepareStatementOrderByInvalidOrder() throws Exception
-    {
+    public void testPrepareStatementOrderByInvalidOrder() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -391,20 +357,16 @@ public class QueryConstraintsTest
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try
-        {
+        try {
             fixture.prepareStatement(mockConnection, "select x, y from table");
             fail("Expected OrderByConstructException");
-        }
-        catch (OrderByConstructException expected)
-        {
+        } catch (OrderByConstructException expected) {
             assertEquals("propertyA backward", expected.getOrderBy());
         }
     }
 
     @Test
-    public void testPrepareStatementAll() throws Exception
-    {
+    public void testPrepareStatementAll() throws Exception {
         PreparedStatement mockStatement = mock(PreparedStatement.class);
 
         Connection mockConnection = mock(Connection.class);
@@ -423,15 +385,14 @@ public class QueryConstraintsTest
         verify(mockConnection).prepareStatement("select x, y from table WHERE propertyA = ? OR propertyB = ? ORDER BY propertyC ASC OFFSET 10 LIMIT 10");
     }
 
-    public static interface TestDataClass
-    {
+    public interface TestDataClass {
         @FilterProperty
-        public String getPropertyA();
+        String getPropertyA();
 
         @FilterProperty
-        public byte getPropertyB();
+        byte getPropertyB();
 
         @FilterProperty
-        public int getPropertyC();
+        int getPropertyC();
     }
 }
