@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.FilterProperty;
+import com.hillayes.query.filter.Property;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 import org.junit.jupiter.api.Test;
 

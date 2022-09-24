@@ -20,13 +20,10 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter.introspection;
+package com.hillayes.query.filter;
 
-import com.hillayes.query.filter.FilterProperty;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
-import com.hillayes.query.filter.util.Strings;
 
-import java.beans.PropertyDescriptor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
@@ -142,8 +139,6 @@ public class Property {
         );
     }
 
-    ;
-
     // the name of the property as given in the filter expression.
     private final String name;
 
@@ -154,36 +149,18 @@ public class Property {
     private final Class<?> datatype;
 
     /**
-     * Constructs a Property instance from the given property values derived from the introspection
-     * of a Bean property, and the annotation placed on the Bean property getter method.
-     *
-     * @param aDescriptor the introspection of a Bean property.
-     * @param aAnnotation the FilterProperty annotation of the Bean property getter method.
-     * @throws UnsupportedDataTypeException if the give class not of a supported type.
-     */
-    Property(PropertyDescriptor aDescriptor, FilterProperty aAnnotation) {
-        this(aAnnotation, aDescriptor.getName(), aDescriptor.getPropertyType());
-    }
-
-    /**
      * Constructs a Property instance from the annotation placed of a Bean property getter method,
      * taking the given values as defaults when the annotation does not specify them.
      *
-     * @param aAnnotation  the FilterProperty annotation of the Bean property getter method.
-     * @param aDefaultName the default value for the property name, and propName name.
-     * @param aDefaultType the default class for the property's data type.
+     * @param aName the value for the property name.
+     * @param aColName the SQL name of the property.
+     * @param aDataType the class for the property's data type.
      * @throws UnsupportedDataTypeException if the give class not of a supported type.
      */
-    Property(FilterProperty aAnnotation, String aDefaultName, Class<?> aDefaultType) {
-        if (aAnnotation == null) {
-            name = aDefaultName;
-            colName = name;
-            datatype = aDefaultType;
-        } else {
-            name = Strings.isEmpty(aAnnotation.name()) ? aDefaultName : aAnnotation.name();
-            colName = Strings.isEmpty(aAnnotation.colname()) ? name : aAnnotation.colname();
-            datatype = (aAnnotation.type() == Void.class) ? aDefaultType : aAnnotation.type();
-        }
+    public Property(String aName, String aColName, Class<?> aDataType) {
+        name = aName;
+        colName = aColName;
+        datatype = aDataType;
 
         checkSupported(datatype);
     }

@@ -22,7 +22,6 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.FilterProperty;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -22,8 +22,6 @@
  */
 package com.hillayes.query.filter;
 
-import com.hillayes.query.filter.introspection.Property;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -67,5 +65,5 @@ public interface QueryContext {
      * parametermarker in the SQL statement; if a database access error occurs or this method is
      * called on a closed PreparedStatement
      */
-    void applyArg(PreparedStatement aStatement) throws SQLException;
+    void applyArgs(PreparedStatement aStatement) throws SQLException;
 }

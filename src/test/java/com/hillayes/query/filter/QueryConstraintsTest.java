@@ -26,6 +26,7 @@ import com.hillayes.query.filter.exceptions.FilterExprException;
 import com.hillayes.query.filter.exceptions.InvalidOrderByColException;
 import com.hillayes.query.filter.exceptions.InvalidPropertyRefException;
 import com.hillayes.query.filter.exceptions.OrderByConstructException;
+import com.hillayes.query.filter.introspection.FilterProperty;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

@@ -22,6 +22,7 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.util.Strings;
 import com.hillayes.query.filter.exceptions.FilterComparisonException;
 import com.hillayes.query.filter.exceptions.FilterException;
@@ -31,13 +32,11 @@ import com.hillayes.query.filter.exceptions.InvalidOrderByColException;
 import com.hillayes.query.filter.exceptions.OrderByConstructException;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 import com.hillayes.query.filter.introspection.Introspection;
-import com.hillayes.query.filter.introspection.Property;
 import com.hillayes.query.filter.introspection.PropertyIntrospector;
 import com.hillayes.query.filter.parser.FilterParser;
 import com.hillayes.query.filter.parser.ParseException;
 import com.hillayes.query.filter.parser.TokenMgrError;
 
-import javax.management.Query;
 import java.beans.IntrospectionException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -127,6 +126,17 @@ public class QueryConstraints {
     }
 
     /**
+     * Sets the order by which the entities are returned.
+     *
+     * @param aValue the order-by clause.
+     * @return the same QueryConstraints instance - for builder-like construction.
+     */
+    public QueryConstraints setOrderBy(String aValue) {
+        orderBy = Strings.isEmpty(aValue) ? null : aValue;
+        return this;
+    }
+
+    /**
      * Returns the orderBy clause.
      */
     public String getOrderBy() {
@@ -134,21 +144,14 @@ public class QueryConstraints {
     }
 
     /**
-     * Sets the order by which the entities are returned.
-     *
-     * @param aValue the order-by clause.
-     */
-    public void setOrderBy(String aValue) {
-        orderBy = Strings.isEmpty(aValue) ? null : aValue;
-    }
-
-    /**
      * Sets the filter expression used to restrict the entities returned by the final query.
      *
      * @param aValue the REST URL query filter value.
+     * @return the same QueryConstraints instance - for builder-like construction.
      */
-    public void setFilter(String aValue) {
+    public QueryConstraints setFilter(String aValue) {
         filter = Strings.isEmpty(aValue) ? null : aValue;
+        return this;
     }
 
     /**
@@ -160,29 +163,16 @@ public class QueryConstraints {
 
     /**
      * Tests whether there are any constraints defined in this QueryConstraints. If
-     * <code>true</code> then calling the {@link #applyTo(Query)} method will have no effect on the
+     * <code>true</code> then calling the prepareStatement() method will have no effect on the
      * given query.
      *
      * @return <code>true</code> if there are constraints to apply.
      */
     public boolean isEmpty() {
-        if (skip != null) {
-            return false;
-        }
-
-        if (top != null) {
-            return false;
-        }
-
-        if (orderBy != null) {
-            return false;
-        }
-
-        if (filter != null) {
-            return false;
-        }
-
-        return true;
+        return (skip == null) &&
+            (top == null) &&
+            (orderBy == null) &&
+            (filter == null);
     }
 
     /**
@@ -194,16 +184,16 @@ public class QueryConstraints {
      * that propName should be sorted. If not specified, the propName will be sorted ascending.
      * Examples would be "name asc", "name desc, lastmodified asc".
      *
-     * @param aDataIntrospection the introspection information for the data-class.
+     * @param aQueryContext the query context with information for the data-class.
      * @throws FilterException if the clause is invalid.
      */
-    private List<OrderByCol> parseOrderBy(Introspection aDataIntrospection) throws FilterException {
+    private List<OrderByCol> parseOrderBy(QueryContext aQueryContext) throws FilterException {
         List<OrderByCol> result = null;
 
         if (!Strings.isEmpty(orderBy)) {
             // split the comma-delimited columns into an ordered list
             for (String element : orderBy.split(",")) {
-                OrderByCol col = OrderByCol.parse(element, aDataIntrospection);
+                OrderByCol col = OrderByCol.parse(element, aQueryContext);
                 if (col != null) {
                     if (result == null) {
                         result = new ArrayList<>();
@@ -225,28 +215,27 @@ public class QueryConstraints {
      * "select a, b, c from table"
      * </pre>
      *
-     * @throws FilterComparisonException if a comparison is not valid for data type.
-     * @throws FilterExprException if the filter is not syntactically valid.
      * @param aConnection the JDBC connection from which the PreparedStatement is obtained.
      * @param aProjection the SQL select statement specifying the columns and table to be selected.
      * @return a PreparedStatement with the given projection and the query constraints applied.
-     * @throws SQLException if a database access error occursor this method is called on a closed
+     * @throws SQLException if a database access error occurs or this method is called on a closed
      * connection.
      * @throws IntrospectionException if an exception occurs during introspection.
      * @throws UnsupportedDataTypeException if any identified property is not of a supported type.
+     * @throws FilterComparisonException if a comparison is not valid for data type.
+     * @throws FilterExprException if the filter is not syntactically valid.
      */
     public PreparedStatement prepareStatement(Connection aConnection, String aProjection)
         throws SQLException, UnsupportedDataTypeException, IntrospectionException {
         StringBuilder sql = new StringBuilder(aProjection);
 
-        Introspection introspection = null;
+        QueryContext context = null;
         if ((filter != null) || (orderBy != null)) {
-            introspection = PropertyIntrospector.introspect(dataClass);
+            Introspection introspection = PropertyIntrospector.introspect(dataClass);
+            context = new DataClassQueryContext(introspection);
         }
 
-        QueryContext context = null;
         if (filter != null) {
-            context = new DataClassQueryContext(introspection);
             try {
                 FilterParser.parse(context, filter);
                 sql.append(" WHERE ").append(context.queryBuilder());
@@ -261,7 +250,7 @@ public class QueryConstraints {
             sql.append(" ORDER BY ");
 
             boolean first = true;
-            for (OrderByCol order : parseOrderBy(introspection)) {
+            for (OrderByCol order : parseOrderBy(context)) {
                 if (!first)
                     sql.append(", ");
                 sql.append(order.getProperty().getColName()).append(" ").append(order.ascending ? "ASC" : "DESC");
@@ -280,7 +269,7 @@ public class QueryConstraints {
         PreparedStatement result = aConnection.prepareStatement(sql.toString());
 
         if (context != null) {
-            context.applyArg(result);
+            context.applyArgs(result);
         }
 
         return result;
@@ -298,9 +287,9 @@ public class QueryConstraints {
      */
     public static class OrderByCol {
         // the property on which the order will be based.
-        Property property;
+        final Property property;
 
-        boolean ascending = true;
+        final boolean ascending;
 
         /**
          * A factor method to parse a single element of a $orderby clause. Examples would be "name
@@ -310,12 +299,12 @@ public class QueryConstraints {
          * <code>null</code>.
          *
          * @param aRawData the $orderby element to be parsed.
-         * @param aDataClass the introspection information about the data-class from which the
+         * @param aQueryContext the introspection information about the data-class from which the
          * order-by property is derived.
          * @return the parsed OrderByCol element.
          * @throws FilterException if the $orderby element is not a valid construct.
          */
-        public static OrderByCol parse(String aRawData, Introspection aDataClass) throws FilterException {
+        public static OrderByCol parse(String aRawData, QueryContext aQueryContext) throws FilterException {
             if (Strings.isEmpty(aRawData)) {
                 return null;
             }
@@ -323,12 +312,12 @@ public class QueryConstraints {
             // propName may be followed by an "asc" or "desc"
             String[] elements = aRawData.trim().split("\\s+");
 
-            // must only be name and optional "asc"/"desc"
+            // must only be the name and optional "asc"/"desc"
             if (elements.length > 2) {
                 throw new OrderByConstructException(aRawData);
             }
 
-            Property propInfo = aDataClass.getProperty(elements[0]);
+            Property propInfo = aQueryContext.getPropertyFor(elements[0]);
             if (propInfo == null) {
                 throw new InvalidOrderByColException(elements[0]);
             }

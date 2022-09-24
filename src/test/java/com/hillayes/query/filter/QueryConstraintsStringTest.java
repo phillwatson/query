@@ -22,6 +22,7 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.introspection.FilterProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

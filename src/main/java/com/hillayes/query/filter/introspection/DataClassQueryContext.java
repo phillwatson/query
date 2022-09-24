@@ -20,10 +20,11 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter;
+package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.introspection.Introspection;
-import com.hillayes.query.filter.introspection.Property;
+import com.hillayes.query.filter.Predicate;
+import com.hillayes.query.filter.Property;
+import com.hillayes.query.filter.QueryContext;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -77,7 +78,7 @@ public class DataClassQueryContext implements QueryContext {
     }
 
     @Override
-    public void applyArg(PreparedStatement aStatement) throws SQLException {
+    public void applyArgs(PreparedStatement aStatement) throws SQLException {
         int argIndex = 1;
         for (Predicate predicate : predicates) {
             argIndex = predicate.applyArg(aStatement, argIndex);

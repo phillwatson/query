@@ -23,7 +23,6 @@
 package com.hillayes.query.filter;
 
 import com.hillayes.query.filter.exceptions.InvalidPropertyRefException;
-import com.hillayes.query.filter.introspection.Property;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

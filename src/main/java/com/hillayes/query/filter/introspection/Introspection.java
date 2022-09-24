@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.FilterProperty;
+import com.hillayes.query.filter.Property;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 
 import java.beans.BeanInfo;
@@ -128,7 +128,7 @@ public class Introspection {
                 continue;
             }
 
-            Property property = new Property(descriptor, filterProperty);
+            Property property = new IntrospectedProperty(descriptor, filterProperty);
             properties.put(property.getName(), property);
         }
     }
@@ -155,7 +155,7 @@ public class Introspection {
 
                 // remove leading "is" and change capitalization
                 name = Introspector.decapitalize(name.substring(2));
-                Property property = new Property(filterProperty, name, returnType);
+                Property property = new IntrospectedProperty(filterProperty, name, returnType);
                 properties.put(property.getName(), property);
             }
         }

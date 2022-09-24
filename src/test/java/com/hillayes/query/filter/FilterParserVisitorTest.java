@@ -22,7 +22,6 @@
  */
 package com.hillayes.query.filter;
 
-import com.hillayes.query.filter.introspection.Property;
 import com.hillayes.query.filter.parser.ASTAnd;
 import com.hillayes.query.filter.parser.ASTComparison;
 import com.hillayes.query.filter.parser.ASTNot;
@@ -303,7 +302,7 @@ public class FilterParserVisitorTest
         }
 
         @Override
-        public void applyArg(PreparedStatement aStatement) throws SQLException
+        public void applyArgs(PreparedStatement aStatement) throws SQLException
         {
         }
     }
