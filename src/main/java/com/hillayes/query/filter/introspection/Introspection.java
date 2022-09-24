@@ -111,8 +111,7 @@ public class Introspection {
      * Adds the properties described by the given BeanInfo to the introspection result.
      *
      * @param aBeanInfo the BeanInfo describing the properties to be included in the introspection.
-     * @throws UnsupportedDataTypeException if the any identified property is not of a supported
-     *                                      type.
+     * @throws UnsupportedDataTypeException if the identified property is not of a supported type.
      */
     private void addBeanInfo(BeanInfo aBeanInfo) throws UnsupportedDataTypeException {
         booleanCheck(aBeanInfo);

@@ -303,7 +303,7 @@ public class FilterParserVisitorTest
         }
 
         @Override
-        public void applyArg(PreparedStatement aStatement, int aArgIndex) throws SQLException
+        public void applyArg(PreparedStatement aStatement) throws SQLException
         {
         }
     }

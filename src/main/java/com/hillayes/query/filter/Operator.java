@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -28,8 +28,7 @@ package com.hillayes.query.filter;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public enum Operator
-{
+public enum Operator {
     EQ("="),
     NE("<>"),
     GT(">"),
@@ -37,15 +36,13 @@ public enum Operator
     GE(">="),
     LE("<=");
 
-    private String mnemonic;
+    private final String mnemonic;
 
-    private Operator(String aMnemonic)
-    {
+    Operator(String aMnemonic) {
         mnemonic = aMnemonic;
     }
 
-    public String getMnemonic()
-    {
+    public String getMnemonic() {
         return mnemonic;
     }
 }

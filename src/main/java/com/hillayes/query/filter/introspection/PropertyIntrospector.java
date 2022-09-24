@@ -45,7 +45,7 @@ public final class PropertyIntrospector {
     private PropertyIntrospector() {
     }
 
-    private static Map<String, Introspection> history = new HashMap<>();
+    private static final Map<String, Introspection> history = new HashMap<>();
 
     /**
      * Recursively introspects the given class and adds any annotated properties to the result.

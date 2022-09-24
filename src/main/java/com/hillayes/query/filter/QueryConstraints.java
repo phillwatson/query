@@ -280,7 +280,7 @@ public class QueryConstraints {
         PreparedStatement result = aConnection.prepareStatement(sql.toString());
 
         if (context != null) {
-            context.applyArg(result, 1);
+            context.applyArg(result);
         }
 
         return result;

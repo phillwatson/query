@@ -39,7 +39,7 @@ public enum FilterFunction
     ISNULL(false); // test if named property is null
 
     // true if the function takes a value (other than a property) as a parameter.
-    private boolean takesValue;
+    private final boolean takesValue;
 
     private FilterFunction(boolean aTakesValue)
     {

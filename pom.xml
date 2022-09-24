@@ -17,8 +17,7 @@
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <javacc.version>7.0.12</javacc.version>
-        <javacc-maven-plugin.version>2.6</javacc-maven-plugin.version>
+        <javacc-maven-plugin.version>3.0.1</javacc-maven-plugin.version>
         <junit5-version>5.9.0</junit5-version>
     </properties>
 
@@ -77,11 +76,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>net.java.dev.javacc</groupId>
-                    <artifactId>javacc</artifactId>
-                    <version>${javacc.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>javacc-maven-plugin</artifactId>
                     <version>${javacc-maven-plugin.version}</version>
@@ -97,6 +91,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
+                            <!-- delete generated parser classes - and re-generate -->
                             <directory>${project.build.sourceDirectory}/com/hillayes/query/filter/parser</directory>
                             <includes>
                                 <include>*</include>

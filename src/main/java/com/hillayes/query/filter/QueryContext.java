@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -34,15 +34,14 @@ import java.sql.SQLException;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public interface QueryContext
-{
+public interface QueryContext {
     /**
-     * Returns the introspection info for the names property.
+     * Returns the introspection info for the named property.
      *
      * @param aName the property whose info is requested.
      * @return the named property's info, or <code>null</code> if not found.
      */
-    public Property getPropertyFor(String aName);
+    Property getPropertyFor(String aName);
 
     /**
      * A factory method to create an instance of Predicate. The implementor can decide whether to
@@ -50,26 +49,23 @@ public interface QueryContext
      *
      * @return a new, empty instance of Predicate.
      */
-    public Predicate newPredicate();
+    Predicate newPredicate();
 
     /**
      * Provides access to the StringBuilder used to construct the SQL query during parsing.
      *
      * @return the SQL query StringBuilder.
      */
-    public StringBuilder queryBuilder();
+    StringBuilder queryBuilder();
 
     /**
      * Applies the predicates, found during the parsing of the query, to the arguments of the given
-     * PreparedStatement. The argument index to which the initial predicate is provided. Subsequent
-     * predicates will be applied to consecutive indices.
+     * PreparedStatement.
      *
      * @param aStatement the PreparedStatement to which the Predicate's value is to be applied.
-     * @param aArgIndex the initial index of the PreparedStatement's argument place-holder to which
-     * the predicates are to be set.
      * @throws SQLException if aArgIndex (or subsequent indices) does not correspond to a
      * parametermarker in the SQL statement; if a database access error occurs or this method is
      * called on a closed PreparedStatement
      */
-    public void applyArg(PreparedStatement aStatement, int aArgIndex) throws SQLException;
+    void applyArg(PreparedStatement aStatement) throws SQLException;
 }
