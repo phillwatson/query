@@ -70,5 +70,20 @@ public interface QueryContext {
      * parametermarker in the SQL statement; if a database access error occurs or this method is
      * called on a closed PreparedStatement
      */
-    void applyArgs(PreparedStatement aStatement) throws SQLException;
+    default void applyArgs(PreparedStatement aStatement) throws SQLException {
+        applyArgs(aStatement, 1);
+    }
+
+    /**
+     * Applies the predicates, found during the parsing of the query, to the arguments of the given
+     * PreparedStatement. The first arguments are applied to the given index, subsequent arguments
+     * are applied consecutively.
+     *
+     * @param aStatement the PreparedStatement to which the Predicate's value is to be applied.
+     * @param aArgIndex the (1-based) index of the first argument in the prepared statement.
+     * @throws SQLException if aArgIndex (or subsequent indices) does not correspond to a
+     * parametermarker in the SQL statement; if a database access error occurs or this method is
+     * called on a closed PreparedStatement
+     */
+    void applyArgs(PreparedStatement aStatement, int aArgIndex) throws SQLException;
 }

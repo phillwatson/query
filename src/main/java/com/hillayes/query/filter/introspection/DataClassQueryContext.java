@@ -84,10 +84,9 @@ public class DataClassQueryContext implements QueryContext {
     }
 
     @Override
-    public void applyArgs(PreparedStatement aStatement) throws SQLException {
-        int argIndex = 1;
+    public void applyArgs(PreparedStatement aStatement, int aArgIndex) throws SQLException {
         for (Predicate predicate : predicates) {
-            argIndex = predicate.applyArg(aStatement, argIndex);
+            aArgIndex = predicate.applyArg(aStatement, aArgIndex);
         }
     }
 }

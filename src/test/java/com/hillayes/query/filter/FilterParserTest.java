@@ -596,7 +596,7 @@ public class FilterParserTest {
         }
 
         @Override
-        public void applyArgs(PreparedStatement aStatement) throws SQLException {
+        public void applyArgs(PreparedStatement aStatement, int aArgIndex) throws SQLException {
         }
     }
 }
