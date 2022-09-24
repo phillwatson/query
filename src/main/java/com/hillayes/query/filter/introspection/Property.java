@@ -129,6 +129,10 @@ public class Property {
             p.setTime(i, java.sql.Time.valueOf(OffsetTime.parse(v).toLocalTime()))
         );
 
+        SUPPORTED_TYPES.put(Instant.class, (p, i, v) -> {
+            p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v)));
+        });
+
         SUPPORTED_TYPES.put(java.sql.Timestamp.class, (p, i, v) -> {
             p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v)));
         });
