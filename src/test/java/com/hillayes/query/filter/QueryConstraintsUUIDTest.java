@@ -173,7 +173,7 @@ public class QueryConstraintsUUIDTest
         verify(statement).setObject(1, UUID_DATA);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public UUID getPropertyA();

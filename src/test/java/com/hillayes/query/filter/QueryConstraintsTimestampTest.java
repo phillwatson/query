@@ -162,7 +162,7 @@ public class QueryConstraintsTimestampTest {
         verify(statement).setTimestamp(1, java.sql.Timestamp.from(CALENDAR_VAL));
     }
 
-    public static interface TestDataClass {
+    public interface TestDataClass {
         @FilterProperty(colname = "a")
         public java.sql.Timestamp getPropertyA();
     }

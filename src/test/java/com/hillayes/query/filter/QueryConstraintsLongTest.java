@@ -218,7 +218,7 @@ public class QueryConstraintsLongTest
         verify(statement).setLong(1, 100);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public long getPropertyA();

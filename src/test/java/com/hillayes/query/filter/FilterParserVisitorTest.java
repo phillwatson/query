@@ -215,7 +215,7 @@ public class FilterParserVisitorTest
 
     private static class Visitor implements FilterParserVisitor
     {
-        private List<Node> visited = new ArrayList<>();
+        private final List<Node> visited = new ArrayList<>();
 
         public List<Node> getVisited()
         {
@@ -279,7 +279,7 @@ public class FilterParserVisitorTest
      * A mock implementation of QueryContext to keep a record of the PropertyComparisons generated
      * during parsing.
      */
-    private class MockQueryContext implements QueryContext
+    private static class MockQueryContext implements QueryContext
     {
         private final StringBuilder query = new StringBuilder();
 

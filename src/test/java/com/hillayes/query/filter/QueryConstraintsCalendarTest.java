@@ -161,7 +161,7 @@ public class QueryConstraintsCalendarTest {
         verify(statement).setDate(1, new java.sql.Date(CALENDAR_VAL.toEpochMilli()));
     }
 
-    public static interface TestDataClass {
+    public interface TestDataClass {
         @FilterProperty(colname = "a")
         public Calendar getPropertyA();
     }

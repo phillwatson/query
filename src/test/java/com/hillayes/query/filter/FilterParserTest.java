@@ -39,12 +39,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -117,7 +112,7 @@ public class FilterParserTest {
         // was the AND operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node child = filter.jjtGetChild(0);
-        assertTrue(child instanceof ASTAnd);
+        assertInstanceOf(ASTAnd.class, child);
 
         // where the two comparisons parsed correctly
         List<Predicate> comparisons = context.getComparisons();
@@ -145,12 +140,12 @@ public class FilterParserTest {
         // was the AND operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node and = filter.jjtGetChild(0);
-        assertTrue(and instanceof ASTAnd);
+        assertInstanceOf(ASTAnd.class, and);
 
         // AND has four comparison nodes
         assertEquals(4, and.jjtGetNumChildren());
         for (int i = 0; i < and.jjtGetNumChildren(); i++) {
-            assertTrue(and.jjtGetChild(i) instanceof ASTComparison);
+            assertInstanceOf(ASTComparison.class, and.jjtGetChild(i));
         }
     }
 
@@ -162,7 +157,7 @@ public class FilterParserTest {
         // was the OR operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node child = filter.jjtGetChild(0);
-        assertTrue(child instanceof ASTOr);
+        assertInstanceOf(ASTOr.class, child);
 
         // where the two comparisons parsed correctly
         List<Predicate> comparisons = context.getComparisons();
@@ -189,7 +184,7 @@ public class FilterParserTest {
         // was the NOT operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node child = filter.jjtGetChild(0);
-        assertTrue(child instanceof ASTNot);
+        assertInstanceOf(ASTNot.class, child);
 
         // was the comparison parsed correctly
         List<Predicate> comparisons = context.getComparisons();
@@ -210,17 +205,17 @@ public class FilterParserTest {
         // was the NOT operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node notNode = filter.jjtGetChild(0);
-        assertTrue(notNode instanceof ASTNot);
+        assertInstanceOf(ASTNot.class, notNode);
 
         // NOT operator has AND node
         assertEquals(1, notNode.jjtGetNumChildren());
         Node andNode = notNode.jjtGetChild(0);
-        assertTrue(andNode instanceof ASTAnd);
+        assertInstanceOf(ASTAnd.class, andNode);
 
         // AND node has two comparitors
         assertEquals(2, andNode.jjtGetNumChildren());
-        assertTrue(andNode.jjtGetChild(0) instanceof ASTComparison);
-        assertTrue(andNode.jjtGetChild(1) instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, andNode.jjtGetChild(0));
+        assertInstanceOf(ASTComparison.class, andNode.jjtGetChild(1));
     }
 
     @Test
@@ -231,7 +226,7 @@ public class FilterParserTest {
         // was the NOT operator detected
         assertEquals(1, filter.jjtGetNumChildren());
         Node notExpression = filter.jjtGetChild(0);
-        assertTrue(notExpression instanceof ASTNot);
+        assertInstanceOf(ASTNot.class, notExpression);
 
         // the NOT has a single child - OR expression
         assertEquals(1, notExpression.jjtGetNumChildren());
@@ -265,39 +260,39 @@ public class FilterParserTest {
         // tree starts with an OR expression
         assertEquals(1, filter.jjtGetNumChildren());
         Node expression = filter.jjtGetChild(0);
-        assertTrue(expression instanceof ASTOr);
+        assertInstanceOf(ASTOr.class, expression);
 
         // the OR expression has two nodes (AND expression and "property_3 le 3")
         assertEquals(2, expression.jjtGetNumChildren());
 
         // RHS - property comparison "property_3 eq 3"
         Node comparator = expression.jjtGetChild(1);
-        assertTrue(comparator instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, comparator);
         Predicate comparison = (Predicate) ((ASTComparison) comparator).jjtGetValue();
         assertEquals("property_3", comparison.getName());
 
         // LHS = the AND expression
         expression = expression.jjtGetChild(0);
-        assertTrue(expression instanceof ASTAnd);
+        assertInstanceOf(ASTAnd.class, expression);
 
         // the AND expression has two nodes ("property_1 le 12" and "property_2 eq 1")
         assertEquals(2, expression.jjtGetNumChildren());
 
         // LHS = property comparison "property_1 le 12"
         comparator = expression.jjtGetChild(0);
-        assertTrue(comparator instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, comparator);
         comparison = (Predicate) ((ASTComparison) comparator).jjtGetValue();
         assertEquals("property_1", comparison.getName());
 
         // RHS - property comparison "property_2 eq 1"
         comparator = expression.jjtGetChild(1);
-        assertTrue(comparator instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, comparator);
         comparison = (Predicate) ((ASTComparison) comparator).jjtGetValue();
         assertEquals("property_2", comparison.getName());
     }
 
     @Test
-    public void testBracketsPredence() throws Exception {
+    public void testBracketsPrecedence() throws Exception {
         // in this expression the OR has precedence due to the brackets
         Node filter = FilterParser.parse(context, "property_1 le 12 AND (property_2 eq 1 OR property_3 eq 3)");
         assertNotNull(filter);
@@ -305,33 +300,33 @@ public class FilterParserTest {
         // tree starts with an AND expression
         assertEquals(1, filter.jjtGetNumChildren());
         Node expression = filter.jjtGetChild(0);
-        assertTrue(expression instanceof ASTAnd);
+        assertInstanceOf(ASTAnd.class, expression);
 
         // the AND expression has two nodes ("property_1 le 12" and OR expression)
         assertEquals(2, expression.jjtGetNumChildren());
 
         // LHS = property comparison "property_1 le 12"
         Node andComparison = expression.jjtGetChild(0);
-        assertTrue(andComparison instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, andComparison);
         Predicate comparison = (Predicate) ((ASTComparison) andComparison).jjtGetValue();
         assertEquals("property_1", comparison.getName());
 
         // RHS = the OR expression
         expression = expression.jjtGetChild(1);
-        assertTrue(expression instanceof ASTOr);
+        assertInstanceOf(ASTOr.class, expression);
 
         // the OR expression has two nodes ("property_2 eq 1" and "property_3 eq 3")
         assertEquals(2, expression.jjtGetNumChildren());
 
         // LHS - property comparison "property_2 eq 1"
         Node comparator = expression.jjtGetChild(0);
-        assertTrue(comparator instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, comparator);
         comparison = (Predicate) ((ASTComparison) comparator).jjtGetValue();
         assertEquals("property_2", comparison.getName());
 
         // RHS - property comparison "property_3 eq 3"
         comparator = expression.jjtGetChild(1);
-        assertTrue(comparator instanceof ASTComparison);
+        assertInstanceOf(ASTComparison.class, comparator);
         comparison = (Predicate) ((ASTComparison) comparator).jjtGetValue();
         assertEquals("property_3", comparison.getName());
     }

@@ -184,7 +184,7 @@ public class QueryConstraintsByteTest {
         verify(statement).setByte(1, (byte) 100);
     }
 
-    public static interface TestDataClass {
+    public interface TestDataClass {
         @FilterProperty(colname = "a")
         public byte getPropertyA();
 

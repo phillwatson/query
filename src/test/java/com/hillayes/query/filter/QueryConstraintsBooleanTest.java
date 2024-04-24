@@ -209,7 +209,7 @@ public class QueryConstraintsBooleanTest
         verify(statement).setBoolean(1, true);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public boolean getPropertyA();

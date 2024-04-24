@@ -203,7 +203,7 @@ public class QueryConstraintsDoubleTest
         verify(statement).setDouble(1, 9999999.99999);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public double getPropertyA();

@@ -216,7 +216,7 @@ public class QueryConstraintsIntegerTest
         verify(statement).setInt(1, 100);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public int getPropertyA();

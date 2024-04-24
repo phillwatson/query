@@ -180,7 +180,7 @@ public class QueryConstraintsBigIntTest
         verify(statement).setLong(1, 999999999999l);
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public BigInteger getPropertyA();

@@ -203,7 +203,7 @@ public class QueryConstraintsStringTest
         verify(statement).setString(1, "abc");
     }
 
-    public static interface TestDataClass
+    public interface TestDataClass
     {
         @FilterProperty(colname = "a")
         public String getPropertyA();
