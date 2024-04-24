@@ -26,6 +26,6 @@ jobs:
     - name: Build with Maven
       # skips the tests due to lack of "test" profile
       run: |
-        mvn -B deploy -Drevision=${{ github.ref }}
+        mvn -B deploy -Drevision=${{ github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
