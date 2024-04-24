@@ -16,6 +16,12 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v4
 
+    - name: Revision meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        tags: type=semver,pattern={{version}}
+
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -26,6 +32,6 @@ jobs:
     - name: Build with Maven
       # skips the tests due to lack of "test" profile
       run: |
-        mvn -B deploy -Drevision=${{ github.ref_name }}
+        mvn -B deploy -Drevision=${{ steps.meta.outputs.tags }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
