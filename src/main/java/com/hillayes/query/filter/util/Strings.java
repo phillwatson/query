@@ -74,9 +74,6 @@ public final class Strings {
      * <code>equals()</code> method of String <code>A</code>.
      */
     public static boolean equals(String a1, String a2) {
-        if (a1 == a2) {
-            return (true);
-        }
         return (a1 != null) && (a1.equals(a2));
     }
 
@@ -87,18 +84,7 @@ public final class Strings {
      * @return <code>true</code> if the string is considered to be empty.
      */
     public static boolean isEmpty(String aStr) {
-        if ((aStr != null) && (aStr.length() > 0)) {
-            // if it only contains whitespace
-            for (int i = 0, n = aStr.length(); i < n; i++) {
-                // uses the same whitespace rule as String.trim()
-                // all chars below and including space are whitespace
-                if (aStr.charAt(i) > ' ') {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return ((aStr == null) || (aStr.isBlank()));
     }
 
     /**

@@ -38,8 +38,7 @@ import java.beans.IntrospectionException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -184,23 +183,23 @@ public class QueryConstraints {
      * @param aQueryContext the query context with information for the data-class.
      * @throws FilterException if the clause is invalid.
      */
-    private List<OrderByCol> parseOrderBy(QueryContext aQueryContext) throws FilterException {
-        List<OrderByCol> result = null;
-
+    private Optional<String> parseOrderBy(QueryContext aQueryContext) throws FilterException {
         if (!Strings.isEmpty(orderBy)) {
+            StringBuilder result = new StringBuilder();
+
             // split the comma-delimited columns into an ordered list
             for (String element : orderBy.split(",")) {
-                OrderByCol col = OrderByCol.parse(element, aQueryContext);
-                if (col != null) {
-                    if (result == null) {
-                        result = new ArrayList<>();
-                    }
-                    result.add(col);
-                }
+                OrderByCol.parse(element, aQueryContext).ifPresent(col -> {
+                    result.append(result.isEmpty() ? " ORDER BY " : ", ")
+                        .append(col.getProperty().getColName())
+                        .append(col.isAscending() ? " ASC" : " DESC");
+                });
             }
+
+            return Optional.of(result.toString());
         }
 
-        return result;
+        return Optional.empty();
     }
 
     /**
@@ -237,17 +236,7 @@ public class QueryConstraints {
             }
         }
 
-        if (orderBy != null) {
-            sql.append(" ORDER BY ");
-
-            boolean first = true;
-            for (OrderByCol order : parseOrderBy(context)) {
-                if (!first)
-                    sql.append(", ");
-                sql.append(order.getProperty().getColName()).append(" ").append(order.ascending ? "ASC" : "DESC");
-                first = false;
-            }
-        }
+        parseOrderBy(context).ifPresent(sql::append);
 
         if (skip != null) {
             sql.append(" OFFSET ").append(skip);
@@ -298,9 +287,9 @@ public class QueryConstraints {
          * @return the parsed OrderByCol element.
          * @throws FilterException if the $orderby element is not a valid construct.
          */
-        public static OrderByCol parse(String aRawData, QueryContext aQueryContext) throws FilterException {
+        public static Optional<OrderByCol> parse(String aRawData, QueryContext aQueryContext) throws FilterException {
             if (Strings.isEmpty(aRawData)) {
-                return null;
+                return Optional.empty();
             }
 
             // propName may be followed by an "asc" or "desc"
@@ -327,7 +316,7 @@ public class QueryConstraints {
                 }
             }
 
-            return new OrderByCol(propInfo, asc);
+            return Optional.of(new OrderByCol(propInfo, asc));
         }
 
         private OrderByCol(Property aProperty, boolean aAscending) {

@@ -14,11 +14,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <javacc-maven-plugin.version>3.0.1</javacc-maven-plugin.version>
-        <junit5-version>5.9.0</junit5-version>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <junit5-version>5.10.2</junit5-version>
     </properties>
 
     <dependencies>
@@ -53,7 +52,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.13.0</version>
                     <configuration>
                         <release>${java.version}</release>
                         <source>${java.version}</source>
@@ -65,7 +64,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
+                    <version>3.2.5</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.junit.jupiter</groupId>
@@ -78,29 +77,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>javacc-maven-plugin</artifactId>
-                    <version>${javacc-maven-plugin.version}</version>
+                    <version>3.1.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <!-- delete generated parser classes - and re-generate -->
-                            <directory>${project.build.sourceDirectory}/com/hillayes/query/filter/parser</directory>
-                            <includes>
-                                <include>*</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
@@ -112,12 +94,6 @@
                         </goals>
                         <configuration>
                             <jdkVersion>${java.version}</jdkVersion>
-                            <sourceDirectory>${project.build.resources[0].directory}</sourceDirectory>
-                            <interimDirectory>${project.build.sourceDirectory}</interimDirectory>
-                            <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
-                            <includes>
-                                <include>FilterParser.jjt</include>
-                            </includes>
                         </configuration>
                     </execution>
                 </executions>

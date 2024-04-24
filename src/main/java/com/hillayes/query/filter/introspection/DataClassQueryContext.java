@@ -30,6 +30,7 @@ import java.beans.IntrospectionException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An implementation of QueryContext that uses the introspection of a given data class to derive
@@ -43,7 +44,7 @@ public class DataClassQueryContext implements QueryContext {
 
     private final StringBuilder query = new StringBuilder();
 
-    private final ArrayList<Predicate> predicates = new ArrayList<>();
+    private final List<Predicate> predicates = new ArrayList<>();
 
     /**
      * Constructs a QueryContext that uses the introspection of the given data class as the basis
