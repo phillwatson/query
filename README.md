@@ -65,3 +65,14 @@ The following query would match the object:
 ```
 address.city eq 'Anytown'
 ```
+
+#### Functions
+Functions can be used to transform properties before comparison. The
+following functions are supported:
+- `lower` - convert the property value to lowercase (`lower(address.city) eq 'abc'`) 
+- `upper` - convert the property value to uppercase (`upper(address.city) eq 'abc'`) 
+- `contains` - true if property value contains given value (case-sensitive) (`contains(address.city, 'abc')`) 
+- `endswith` - true if property value starts with given value (case-sensitive) (`endswith(address.city, 'abc')`) 
+- `startswith` - true if property value ends with given value (case-sensitive) (`startswith(address.city, 'abc')`) 
+- `isnull` -  true if the property value is null (`isnull(address.city)`) 
+- `notnull` - true if the property value is NOT null (`notnull(address.city)`) 
