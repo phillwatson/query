@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -20,49 +20,44 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter.introspection;
+package com.hillayes.query.filter;
 
-import org.junit.jupiter.api.Test;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+public class QueryClass implements Queryable {
+    private final Class<?> dataClass;
+    private final Map<String,Queryable> properties = new HashMap<>();
 
-/**
- *
- * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
- * @since 1.0.0
- */
-public class PropertyIntrospectorTest
-{
-    @Test
-    public void testNullDataClass() throws Exception
-    {
-        try
-        {
-            PropertyIntrospector.introspect(null);
-            fail("Expected NullPointerException");
-        }
-        catch (NullPointerException expected)
-        {
-            assertEquals("A class must be provided for introspection.", expected.getMessage());
-        }
+    public QueryClass(Class<?> aDataClass) {
+        dataClass = aDataClass;
     }
 
-    @Test
-    public void testCache() throws Exception
-    {
-        Introspection introspection = PropertyIntrospector.introspect(TestClass.class);
-
-        assertSame(introspection, PropertyIntrospector.introspect(TestClass.class));
+    public Class<?> getDataClass() {
+        return dataClass;
     }
 
-    interface TestClass
-    {
-        @FilterProperty
-        public boolean isValueA();
+    @Override
+    public QueryProperty getProperty(PropertyPath aPath) {
+        if (aPath != null) {
+            Queryable queryable = properties.get(aPath.getName());
+            if (queryable != null) {
+                return aPath.hasChild()
+                    ? queryable.getProperty(aPath.getChild())
+                    : (QueryProperty)queryable;
+            }
+        }
 
-        @FilterProperty
-        public int getValueB();
+        return null;
+    }
+
+    public Collection<Queryable> getProperties() {
+        return properties.values();
+    }
+
+    public Queryable addProperty(String aName, Queryable aProperty) {
+        properties.put(aName, aProperty);
+        return aProperty;
     }
 }

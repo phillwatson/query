@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.Property;
+import com.hillayes.query.filter.QueryProperty;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 import com.hillayes.query.filter.util.Strings;
 
@@ -34,7 +34,7 @@ import java.beans.PropertyDescriptor;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class IntrospectedProperty extends Property {
+public class IntrospectedProperty extends QueryProperty {
     /**
      * Constructs a Property instance from the given property values derived from the introspection
      * of a Bean property, and the annotation placed on the Bean property getter method.

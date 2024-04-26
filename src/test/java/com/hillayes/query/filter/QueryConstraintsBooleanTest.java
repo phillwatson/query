@@ -24,8 +24,6 @@ package com.hillayes.query.filter;
 
 import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.introspection.FilterProperty;
-import com.hillayes.query.filter.introspection.Introspection;
-import com.hillayes.query.filter.introspection.PropertyIntrospector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,14 +31,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  *

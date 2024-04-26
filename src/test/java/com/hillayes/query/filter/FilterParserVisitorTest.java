@@ -301,9 +301,9 @@ public class FilterParserVisitorTest
         }
 
         @Override
-        public Property getPropertyFor(String aName)
+        public QueryProperty getPropertyFor(String aName)
         {
-            return Mockito.mock(Property.class);
+            return Mockito.mock(QueryProperty.class);
         }
 
         @Override

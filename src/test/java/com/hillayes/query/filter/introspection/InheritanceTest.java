@@ -39,7 +39,7 @@ public class InheritanceTest
     @Test
     public void testClassInheritance() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(ClassC.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(ClassC.class);
 
         assertNotNull(introspection);
 
@@ -52,7 +52,7 @@ public class InheritanceTest
     @Test
     public void testInterfaceInheritance() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(InterfaceC.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(InterfaceC.class);
 
         assertNotNull(introspection);
 
@@ -68,7 +68,7 @@ public class InheritanceTest
     @Test
     public void testClassAndInterfaceInheritance() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(ClassD.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(ClassD.class);
 
         assertNotNull(introspection);
 

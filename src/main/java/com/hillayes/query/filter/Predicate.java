@@ -39,7 +39,7 @@ import java.sql.SQLException;
 public class Predicate {
     private final QueryContext context;
 
-    private Property property;
+    private QueryProperty property;
 
     private FilterFunction function;
 

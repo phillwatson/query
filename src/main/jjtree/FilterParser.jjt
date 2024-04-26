@@ -101,14 +101,10 @@ public class FilterParser
      * validate the generated Predicate.
      * @param aFilter the REST URL query filter expression to be parsed.
      * @return the root node of the parsed filter expression.
-     *
-     * See http://confluence.tibco.com/display/BPM/Building+the+dt-query-filter+Module
-     * for more information.
      */
     public static Node parse(QueryContext aContext, String aFilter) throws ParseException, TokenMgrError, InvalidComparisonException
     {
-        if ((aFilter != null) && (aFilter.length() > 0))
-        {
+        if ((aFilter != null) && (aFilter.length() > 0)) {
             FilterParser parser = new FilterParser(new StringReader(aFilter));
             return parser.parse(aContext);
         }
@@ -243,8 +239,7 @@ void Comparison(QueryContext aContext) throws InvalidComparisonException: { Pred
 
     {
       // validate the resulting expression
-      if (! predicate.isValid())
-      {
+      if (! predicate.isValid()) {
          throw new InvalidComparisonException(predicate);
       }
 
@@ -271,7 +266,7 @@ void NullFunction(QueryContext aContext, Predicate aPredicate) #void : { }
     )
 
     <LPAREN>
-    // look for a propety name parameter to the function
+    // look for a property name parameter to the function
     <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
     <RPAREN>
 }
@@ -293,7 +288,7 @@ void BooleanFunction(QueryContext aContext, Predicate aPredicate) #void : { }
     )
 
     <LPAREN>
-    // look for a propety name parameter to the function
+    // look for a property name parameter to the function
     <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
     <COMMA>
     // look for the value parameter to the function

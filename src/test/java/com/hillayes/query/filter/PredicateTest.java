@@ -52,7 +52,7 @@ public class PredicateTest {
     @Test
     public void testName() throws Exception {
         QueryContext mockContext = Mockito.mock(QueryContext.class);
-        when(mockContext.getPropertyFor(anyString())).thenReturn(Mockito.mock(Property.class));
+        when(mockContext.getPropertyFor(anyString())).thenReturn(Mockito.mock(QueryProperty.class));
 
         Predicate fixture = new Predicate(mockContext);
 

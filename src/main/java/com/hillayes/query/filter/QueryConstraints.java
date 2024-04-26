@@ -270,7 +270,7 @@ public class QueryConstraints {
      */
     public static class OrderByCol {
         // the property on which the order will be based.
-        final Property property;
+        final QueryProperty property;
 
         final boolean ascending;
 
@@ -300,7 +300,7 @@ public class QueryConstraints {
                 throw new OrderByConstructException(aRawData);
             }
 
-            Property propInfo = aQueryContext.getPropertyFor(elements[0]);
+            QueryProperty propInfo = aQueryContext.getPropertyFor(elements[0]);
             if (propInfo == null) {
                 throw new InvalidOrderByColException(elements[0]);
             }
@@ -319,7 +319,7 @@ public class QueryConstraints {
             return Optional.of(new OrderByCol(propInfo, asc));
         }
 
-        private OrderByCol(Property aProperty, boolean aAscending) {
+        private OrderByCol(QueryProperty aProperty, boolean aAscending) {
             property = aProperty;
             ascending = aAscending;
         }
@@ -327,7 +327,7 @@ public class QueryConstraints {
         /**
          * Returns the name of the data class property on which to perform the order by.
          */
-        public Property getProperty() {
+        public QueryProperty getProperty() {
             return property;
         }
 
