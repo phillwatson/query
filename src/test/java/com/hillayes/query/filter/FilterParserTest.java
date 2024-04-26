@@ -32,7 +32,6 @@ import com.hillayes.query.filter.parser.ParseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -586,8 +585,8 @@ public class FilterParserTest {
         }
 
         @Override
-        public Property getPropertyFor(String aName) {
-            return Mockito.mock(Property.class);
+        public QueryProperty getPropertyFor(String aName) {
+            return new QueryProperty(aName, "colName", String.class);
         }
 
         @Override

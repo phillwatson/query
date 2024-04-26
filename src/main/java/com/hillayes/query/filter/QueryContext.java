@@ -44,7 +44,7 @@ public interface QueryContext {
      * @param aName the property whose info is requested.
      * @return the named property's info, or <code>null</code> if not found.
      */
-    Property getPropertyFor(String aName);
+    QueryProperty getPropertyFor(String aName);
 
     /**
      * A factory method to create an instance of Predicate. The implementor can decide whether to

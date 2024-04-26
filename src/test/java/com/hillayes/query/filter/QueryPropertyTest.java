@@ -20,9 +20,8 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter.introspection;
+package com.hillayes.query.filter;
 
-import com.hillayes.query.filter.Property;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -42,12 +41,12 @@ import static org.mockito.Mockito.verify;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class PropertyTest {
+public class QueryPropertyTest {
     @Test
     public void testToTypeString() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", String.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", String.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "String Value");
@@ -58,7 +57,7 @@ public class PropertyTest {
     public void testToType_boolean() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", boolean.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", boolean.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "True");
@@ -73,7 +72,7 @@ public class PropertyTest {
     public void testToTypeBoolean() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Boolean.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Boolean.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "True");
@@ -88,7 +87,7 @@ public class PropertyTest {
     public void testToTypeByte() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Byte.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Byte.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "123");
@@ -99,7 +98,7 @@ public class PropertyTest {
     public void testToType_byte() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", byte.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", byte.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "123");
@@ -110,7 +109,7 @@ public class PropertyTest {
     public void testToTypeInteger() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Integer.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Integer.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -121,7 +120,7 @@ public class PropertyTest {
     public void testToTypeInt() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", int.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", int.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -132,7 +131,7 @@ public class PropertyTest {
     public void testToTypeLong() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Long.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Long.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -143,7 +142,7 @@ public class PropertyTest {
     public void testToType_long() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", long.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", long.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -154,7 +153,7 @@ public class PropertyTest {
     public void testToTypeBigInteger() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", BigInteger.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", BigInteger.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -165,7 +164,7 @@ public class PropertyTest {
     public void testToTypeBigDecimal() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", BigDecimal.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", BigDecimal.class);
 
         statement = spy(PreparedStatement.class);
         BigDecimal value = new BigDecimal("999.99");
@@ -177,7 +176,7 @@ public class PropertyTest {
     public void testToTypeDouble() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Double.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Double.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -188,7 +187,7 @@ public class PropertyTest {
     public void testToType_double() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", double.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", double.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -199,7 +198,7 @@ public class PropertyTest {
     public void testToTypeFloat() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Float.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Float.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -210,7 +209,7 @@ public class PropertyTest {
     public void testToType_float() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", float.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", float.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -221,7 +220,7 @@ public class PropertyTest {
     public void testToTypeCalendar() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Calendar.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Calendar.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -233,7 +232,7 @@ public class PropertyTest {
     public void testToTypeDate() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", Date.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", Date.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -245,7 +244,7 @@ public class PropertyTest {
     public void testToTypeSqlDate() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", java.sql.Date.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", java.sql.Date.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -257,7 +256,7 @@ public class PropertyTest {
     public void testToTypeTime() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", java.sql.Time.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", java.sql.Time.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "20:30:40.000+01:00");
@@ -274,7 +273,7 @@ public class PropertyTest {
     public void testToTypeTimestamp() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", java.sql.Timestamp.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", java.sql.Timestamp.class);
 
         statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -286,7 +285,7 @@ public class PropertyTest {
     public void testToTypeUUID() throws Exception {
         PreparedStatement statement;
 
-        Property fixture = new Property("name", "col_name", UUID.class);
+        QueryProperty fixture = new QueryProperty("name", "col_name", UUID.class);
 
         statement = spy(PreparedStatement.class);
         UUID value = UUID.randomUUID();

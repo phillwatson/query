@@ -23,7 +23,8 @@
 package com.hillayes.query.filter.introspection;
 
 import com.hillayes.query.filter.Predicate;
-import com.hillayes.query.filter.Property;
+import com.hillayes.query.filter.QueryClass;
+import com.hillayes.query.filter.QueryProperty;
 import com.hillayes.query.filter.QueryContext;
 
 import java.beans.IntrospectionException;
@@ -33,14 +34,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An implementation of QueryContext that uses the introspection of a given data class to derive
- * information used to verify named properties within the query.
+ * An implementation of QueryContext that uses the introspection of a given
+ * data class to derive information used to verify named properties within
+ * the query.
  *
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
 public class DataClassQueryContext implements QueryContext {
-    private final Introspection introspection;
+    private final QueryClass queryClass;
 
     private final StringBuilder query = new StringBuilder();
 
@@ -51,23 +53,23 @@ public class DataClassQueryContext implements QueryContext {
      * for validation of the property names within a filter query.
      */
     public DataClassQueryContext(Class<?> aDataClass) throws IntrospectionException {
-        introspection = PropertyIntrospector.introspect(aDataClass);
+        queryClass = IntrospectedClass.introspect(aDataClass);
     }
 
     @Override
     public String getClassName() {
-        return introspection.getDataClass().getName();
+        return queryClass.getDataClass().getName();
     }
 
     /**
-     * Returns the introspection info for the names property.
+     * Returns the introspection info for the named property.
      *
      * @param aName the property whose info is requested.
      * @return the named property's info, or <code>null</code> if not found.
      */
     @Override
-    public Property getPropertyFor(String aName) {
-        return introspection.getProperty(aName);
+    public QueryProperty getPropertyFor(String aName) {
+        return queryClass.getProperty(aName);
     }
 
     @Override

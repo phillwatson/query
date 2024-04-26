@@ -41,7 +41,7 @@ import java.util.UUID;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class Property {
+public class QueryProperty implements Queryable {
     /**
      * An array of classes that are supported by the filter query. If any other classes are found
      * during the introspection, a {@link UnsupportedDataTypeException} will be raised.
@@ -52,91 +52,32 @@ public class Property {
     static final Map<Class<?>, ArgumentSetter> SUPPORTED_TYPES = new HashMap<>();
 
     static {
-        SUPPORTED_TYPES.put(byte.class, (p, i, v) ->
-            p.setByte(i, Byte.parseByte(v))
-        );
-
-        SUPPORTED_TYPES.put(int.class, (p, i, v) ->
-            p.setInt(i, Integer.parseInt(v))
-        );
-
-        SUPPORTED_TYPES.put(long.class, (p, i, v) ->
-            p.setLong(i, Long.parseLong(v))
-        );
-
-        SUPPORTED_TYPES.put(float.class, (p, i, v) ->
-            p.setFloat(i, Float.parseFloat(v))
-        );
-
-        SUPPORTED_TYPES.put(double.class, (p, i, v) ->
-            p.setDouble(i, Double.parseDouble(v))
-        );
-
-        SUPPORTED_TYPES.put(boolean.class, (p, i, v) ->
-            p.setBoolean(i, Boolean.parseBoolean(v))
-        );
-
-        SUPPORTED_TYPES.put(Byte.class, (p, i, v) ->
-            p.setByte(i, Byte.parseByte(v))
-        );
-
-        SUPPORTED_TYPES.put(Integer.class, (p, i, v) ->
-            p.setInt(i, Integer.parseInt(v))
-        );
-
-        SUPPORTED_TYPES.put(Long.class, (p, i, v) ->
-            p.setLong(i, Long.parseLong(v))
-        );
-
-        SUPPORTED_TYPES.put(Float.class, (p, i, v) ->
-            p.setFloat(i, Float.parseFloat(v))
-        );
-
-        SUPPORTED_TYPES.put(Double.class, (p, i, v) ->
-            p.setDouble(i, Double.parseDouble(v))
-        );
-
-        SUPPORTED_TYPES.put(Boolean.class, (p, i, v) ->
-            p.setBoolean(i, Boolean.parseBoolean(v))
-        );
-
-        SUPPORTED_TYPES.put(BigInteger.class, (p, i, v) ->
-            p.setLong(i, new BigInteger(v).longValue())
-        );
-
-        SUPPORTED_TYPES.put(BigDecimal.class, (p, i, v) ->
-            p.setBigDecimal(i, new BigDecimal(v))
-        );
-
+        SUPPORTED_TYPES.put(byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
+        SUPPORTED_TYPES.put(int.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
+        SUPPORTED_TYPES.put(long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
+        SUPPORTED_TYPES.put(float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
+        SUPPORTED_TYPES.put(double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
+        SUPPORTED_TYPES.put(boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
+        SUPPORTED_TYPES.put(Byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
+        SUPPORTED_TYPES.put(Integer.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
+        SUPPORTED_TYPES.put(Long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
+        SUPPORTED_TYPES.put(Float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
+        SUPPORTED_TYPES.put(Double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
+        SUPPORTED_TYPES.put(Boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
+        SUPPORTED_TYPES.put(BigInteger.class, (p, i, v) -> p.setLong(i, new BigInteger(v).longValue()));
+        SUPPORTED_TYPES.put(BigDecimal.class, (p, i, v) -> p.setBigDecimal(i, new BigDecimal(v)));
         SUPPORTED_TYPES.put(String.class, PreparedStatement::setString);
+        SUPPORTED_TYPES.put(UUID.class, (p, i, v) -> p.setObject(i, UUID.fromString(v)));
+        SUPPORTED_TYPES.put(java.util.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+        SUPPORTED_TYPES.put(java.sql.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+        SUPPORTED_TYPES.put(java.sql.Time.class, (p, i, v) -> p.setTime(i, java.sql.Time.valueOf(OffsetTime.parse(v).toLocalTime())));
+        SUPPORTED_TYPES.put(Instant.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
+        SUPPORTED_TYPES.put(java.sql.Timestamp.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
+        SUPPORTED_TYPES.put(Calendar.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+    }
 
-        SUPPORTED_TYPES.put(UUID.class, (p, i, v) ->
-            p.setObject(i, UUID.fromString(v))
-        );
-
-        SUPPORTED_TYPES.put(java.util.Date.class, (p, i, v) ->
-            p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli()))
-        );
-
-        SUPPORTED_TYPES.put(java.sql.Date.class, (p, i, v) ->
-            p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli()))
-        );
-
-        SUPPORTED_TYPES.put(java.sql.Time.class, (p, i, v) ->
-            p.setTime(i, java.sql.Time.valueOf(OffsetTime.parse(v).toLocalTime()))
-        );
-
-        SUPPORTED_TYPES.put(Instant.class, (p, i, v) -> {
-            p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v)));
-        });
-
-        SUPPORTED_TYPES.put(java.sql.Timestamp.class, (p, i, v) -> {
-            p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v)));
-        });
-
-        SUPPORTED_TYPES.put(Calendar.class, (p, i, v) ->
-            p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli()))
-        );
+    public static boolean isSupportedType(Class<?> aClass) {
+        return SUPPORTED_TYPES.containsKey(aClass);
     }
 
     // the name of the property as given in the filter expression.
@@ -157,24 +98,14 @@ public class Property {
      * @param aDataType the class for the property's data type.
      * @throws UnsupportedDataTypeException if the give class not of a supported type.
      */
-    public Property(String aName, String aColName, Class<?> aDataType) {
+    public QueryProperty(String aName, String aColName, Class<?> aDataType) {
+        if (! isSupportedType(aDataType)) {
+            throw new UnsupportedDataTypeException(aDataType);
+        }
+
         name = aName;
         colName = aColName;
         datatype = aDataType;
-
-        checkSupported(datatype);
-    }
-
-    /**
-     * Tests whether the given class is supported by the query API.
-     *
-     * @param aClass the class to be tested.
-     * @throws UnsupportedDataTypeException if the give class not of a supported type.
-     */
-    private void checkSupported(Class<?> aClass) {
-        if (!Property.SUPPORTED_TYPES.containsKey(aClass)) {
-            throw new UnsupportedDataTypeException(aClass);
-        }
     }
 
     /**
@@ -203,14 +134,14 @@ public class Property {
      * value will be coerced to the appropriate type; according to the Property's datetype.
      *
      * @param aStatement the PreparedStatement in which the value is to be set.
-     * @param aArgIndex  the index of the PreparedStatement argument in which the value is to be set.
-     * @param aValue     the value to be coerced and assigned to the given PreparedStatement.
+     * @param aArgIndex the index of the PreparedStatement argument in which the value is to be set.
+     * @param aValue the value to be coerced and assigned to the given PreparedStatement.
      * @throws SQLException if aArgIndex does not correspond to a parameter marker in the SQL
-     *                      statement; if a database access error occurs or this method is called on a closed
-     *                      PreparedStatement
+     *     statement; if a database access error occurs or this method is called on a closed
+     *     PreparedStatement
      */
     public void applyTo(PreparedStatement aStatement, int aArgIndex, String aValue) throws SQLException {
-        ArgumentSetter setter = Property.SUPPORTED_TYPES.get(datatype);
+        ArgumentSetter setter = QueryProperty.SUPPORTED_TYPES.get(datatype);
         if (setter == null) {
             throw new UnsupportedDataTypeException(datatype);
         }
@@ -233,9 +164,9 @@ public class Property {
          * implementation will coerce the value to the appropriate type.
          *
          * @param aStatement the PreparedStatement in which the value is to be set.
-         * @param aIndex     the index of the PreparedStatement argument in which the value is to be
-         *                   set.
-         * @param aValue     the value to be coerced and assigned to the given PreparedStatement.
+         * @param aIndex the index of the PreparedStatement argument in which the value is to be
+         *     set.
+         * @param aValue the value to be coerced and assigned to the given PreparedStatement.
          */
         void setArg(PreparedStatement aStatement, int aIndex, String aValue) throws SQLException;
     }

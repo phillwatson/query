@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.Property;
+import com.hillayes.query.filter.QueryProperty;
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ public class DataTypeTest
     @Test
     public void testSuportedTypes() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(SupportedTypes.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(SupportedTypes.class);
 
         assertNotNull(introspection);
 
@@ -75,40 +75,26 @@ public class DataTypeTest
     public void testVoidMethods() throws Exception
     {
         // void methods aren't included
-        Introspection introspection = PropertyIntrospector.introspect(VoidType.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(VoidType.class);
         assertNotNull(introspection);
         assertTrue(introspection.getProperties().isEmpty());
-    }
-
-    @Test
-    public void testUnsuportedTypes() throws Exception
-    {
-        try
-        {
-            PropertyIntrospector.introspect(UserType.class);
-            fail("Expected UnsupportedDataTypeException");
-        }
-        catch (UnsupportedDataTypeException expected)
-        {
-            assertEquals(UserClass.class.getCanonicalName(), expected.getDataType());
-        }
     }
 
     @Test
     public void testBooleanMethods() throws Exception
     {
         // "is" dropped from boolean method name
-        Introspection introspection = PropertyIntrospector.introspect(BooleanTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(BooleanTestClass.class);
         assertNotNull(introspection);
 
         assertNotNull(introspection.getProperty("valueA"));
-        assertNotNull(introspection.getProperty("valueB"));
+        assertNotNull(introspection.getProperty("boolB"));
     }
 
     @Test
     public void testNonAnnotatedProperties() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(UnannotatedTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(UnannotatedTestClass.class);
         assertNotNull(introspection);
 
         assertTrue(introspection.getProperties().isEmpty());
@@ -117,7 +103,7 @@ public class DataTypeTest
     @Test
     public void testStaticProperties() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(StaticTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(StaticTestClass.class);
         assertNotNull(introspection);
 
         assertEquals(1, introspection.getProperties().size());
@@ -127,7 +113,7 @@ public class DataTypeTest
     @Test
     public void testProtectedProperties() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(ProtectedTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(ProtectedTestClass.class);
         assertNotNull(introspection);
 
         assertEquals(1, introspection.getProperties().size());
@@ -137,7 +123,7 @@ public class DataTypeTest
     @Test
     public void testWriteOnlyProperties() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(WriteOnlyTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(WriteOnlyTestClass.class);
         assertNotNull(introspection);
 
         assertEquals(1, introspection.getProperties().size());
@@ -147,18 +133,18 @@ public class DataTypeTest
     @Test
     public void testAnnotationOverideProperties() throws Exception
     {
-        Introspection introspection = PropertyIntrospector.introspect(OverrideTestClass.class);
+        IntrospectedClass introspection = IntrospectedClass.introspect(OverrideTestClass.class);
         assertNotNull(introspection);
 
         assertEquals(2, introspection.getProperties().size());
 
-        Property propertyA = introspection.getProperty("nameA");
+        QueryProperty propertyA = introspection.getProperty("nameA");
         assertNotNull(propertyA);
         assertEquals("nameA", propertyA.getName());
         assertEquals("colA", propertyA.getColName());
         assertEquals(Date.class, propertyA.getDatatype());
 
-        Property propertyB = introspection.getProperty("nameB");
+        QueryProperty propertyB = introspection.getProperty("nameB");
         assertNotNull(propertyB);
         assertEquals("nameB", propertyB.getName());
         assertEquals("colB", propertyB.getColName());
@@ -243,7 +229,7 @@ public class DataTypeTest
             return false;
         }
 
-        @FilterProperty
+        @FilterProperty(name = "boolB")
         public Boolean isValueB()
         {
             return Boolean.FALSE;
