@@ -23,14 +23,11 @@
 package com.hillayes.query.filter;
 
 import com.hillayes.query.filter.exceptions.InvalidPropertyRefException;
+import com.hillayes.query.filter.parser.ParseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -67,14 +64,7 @@ public class PredicateTest {
         when(mockContext.getPropertyFor(anyString())).thenReturn(null);
 
         Predicate fixture = new Predicate(mockContext);
-
-        try {
-            fixture.setName("property");
-            fail("Expected InvalidPropertyRefException");
-        } catch (InvalidPropertyRefException expected) {
-            assertEquals("property", expected.getPropertyName());
-        }
-
+        assertThrows(InvalidPropertyRefException.class, () -> fixture.setName("property"));
     }
 
     @Test

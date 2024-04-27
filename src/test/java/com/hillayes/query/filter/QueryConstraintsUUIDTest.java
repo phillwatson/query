@@ -22,6 +22,7 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.exceptions.OrderByConstructException;
 import com.hillayes.query.filter.introspection.DataClassQueryContext;
 import com.hillayes.query.filter.introspection.FilterProperty;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +32,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -65,14 +65,7 @@ public class QueryConstraintsUUIDTest
     {
         fixture.setFilter("propertyA EQ 'abc'");
 
-        try
-        {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected IllegalArgumentException");
-        }
-        catch (IllegalArgumentException expected)
-        {
-        }
+        assertThrows(IllegalArgumentException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test

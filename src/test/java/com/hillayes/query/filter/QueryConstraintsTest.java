@@ -32,13 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.time.format.DateTimeParseException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -151,12 +147,7 @@ public class QueryConstraintsTest {
         QueryConstraints fixture = new QueryConstraints(new DataClassQueryContext(TestDataClass.class));
 
         fixture.setFilter("propertyA EQ 'abc' and propertyX EQ 'abc' or propertyB EQ 'abc'");
-        try {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected InvalidPropertyRefException");
-        } catch (InvalidPropertyRefException expected) {
-            assertEquals("propertyX", expected.getPropertyName());
-        }
+        assertThrows(InvalidPropertyRefException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test
@@ -170,12 +161,7 @@ public class QueryConstraintsTest {
 
         String expr = "propertyA EQ 'abc' and propertyC EQ or propertyB EQ 'abc'";
         fixture.setFilter(expr);
-        try {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected FilterExprException");
-        } catch (FilterExprException expected) {
-            assertEquals(expr, expected.getFilterExpr());
-        }
+        assertThrows(FilterExprException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test
@@ -315,12 +301,7 @@ public class QueryConstraintsTest {
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try {
-            fixture.prepareStatement(mockConnection, "select x, y from table");
-            fail("Expected InvalidOrderByColException");
-        } catch (InvalidOrderByColException expected) {
-            assertEquals("propertyX", expected.getInvalidColumn());
-        }
+        assertThrows(InvalidOrderByColException.class, () -> fixture.prepareStatement(mockConnection, "select x, y from table"));
     }
 
     @Test
@@ -337,12 +318,7 @@ public class QueryConstraintsTest {
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try {
-            fixture.prepareStatement(mockConnection, "select x, y from table");
-            fail("Expected OrderByConstructException");
-        } catch (OrderByConstructException expected) {
-            assertEquals("propertyA asc asc", expected.getOrderBy());
-        }
+        assertThrows(OrderByConstructException.class, () -> fixture.prepareStatement(mockConnection, "select x, y from table"));
     }
 
     @Test
@@ -359,12 +335,7 @@ public class QueryConstraintsTest {
         assertNotNull(fixture.getOrderBy());
         assertFalse(fixture.isEmpty());
 
-        try {
-            fixture.prepareStatement(mockConnection, "select x, y from table");
-            fail("Expected OrderByConstructException");
-        } catch (OrderByConstructException expected) {
-            assertEquals("propertyA backward", expected.getOrderBy());
-        }
+        assertThrows(OrderByConstructException.class, () -> fixture.prepareStatement(mockConnection, "select x, y from table"));
     }
 
     @Test

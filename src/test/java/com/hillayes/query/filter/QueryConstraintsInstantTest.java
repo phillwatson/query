@@ -32,8 +32,7 @@ import java.sql.PreparedStatement;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -71,11 +70,7 @@ public class QueryConstraintsInstantTest {
     public void testFormatException() throws Exception {
         fixture.setFilter("propertyA EQ 'abc'");
 
-        try {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected DateTimeParseException");
-        } catch (DateTimeParseException expected) {
-        }
+        assertThrows(DateTimeParseException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test

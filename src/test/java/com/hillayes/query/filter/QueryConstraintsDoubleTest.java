@@ -30,8 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -62,14 +61,7 @@ public class QueryConstraintsDoubleTest
     {
         fixture.setFilter("propertyA EQ 'abc'");
 
-        try
-        {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected NumberFormatException");
-        }
-        catch (NumberFormatException expected)
-        {
-        }
+        assertThrows(NumberFormatException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test

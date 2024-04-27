@@ -441,116 +441,49 @@ public class FilterParserTest {
 
     @Test
     public void testEndWithNumeric() throws Exception {
-        try {
-            FilterParser.parse(context, "endswith(property, 999)");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(property, 999)"));
     }
 
     @Test
     public void testEndWithIdentifier() throws Exception {
-        try {
-            FilterParser.parse(context, "endswith(property, name)");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(property, name)"));
     }
 
     @Test
     public void testFunctionCaseSensitive() throws Exception {
-        try {
-            FilterParser.parse(context, "iSNull(property)");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "NULL(property)");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "EndsWith(property, 'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "StartsWith(property, 'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "CONTAINS(property, 'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "Upper(property) le 'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "LOWER(property) le 'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "iSNull(property)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "NULL(property)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "EndsWith(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "StartsWith(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "CONTAINS(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "Upper(property) le 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "LOWER(property) le 'abc')"));
     }
 
     @Test
     public void testFunctionMissingParam() throws Exception {
-        try {
-            FilterParser.parse(context, "isnull()");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
-
-        try {
-            FilterParser.parse(context, "notnull()");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "isnull()"));
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "notnull()"));
     }
 
     @Test
     public void testFunctionMissingParamOne() throws Exception {
-        try {
-            FilterParser.parse(context, "endswith(a)");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(a)"));
     }
 
     @Test
     public void testFunctionMissingParamTwo() throws Exception {
-        try {
-            FilterParser.parse(context, "endswith()");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith()"));
     }
 
     @Test
     public void testInvalidUnaryFunction() throws Exception {
-        try {
-            FilterParser.parse(context, "invalid(property) GT 'abc'");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "invalid(property) GT 'abc'"));
     }
 
     @Test
     public void testInvalidFunction() throws Exception {
-        try {
-            FilterParser.parse(context, "invalid(property,'abc')");
-            fail("Expected ParseException");
-        } catch (ParseException expected) {
-        }
+        assertThrows(ParseException.class, () -> FilterParser.parse(context, "invalid(property,'abc')"));
     }
 
     /**

@@ -31,8 +31,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -66,11 +65,7 @@ public class QueryConstraintsBigDecTest {
     public void testNumberFormatException() throws Exception {
         fixture.setFilter("propertyA EQ 'abc'");
 
-        try {
-            fixture.prepareStatement(mockConnection, "select x from table");
-            fail("Expected NumberFormatException");
-        } catch (NumberFormatException expected) {
-        }
+        assertThrows(NumberFormatException.class, () -> fixture.prepareStatement(mockConnection, "select x from table"));
     }
 
     @Test

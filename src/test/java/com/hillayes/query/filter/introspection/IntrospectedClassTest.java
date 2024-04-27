@@ -36,15 +36,10 @@ public class IntrospectedClassTest
     @Test
     public void testNullDataClass() throws Exception
     {
-        try
-        {
-            IntrospectedClass.introspect(null);
-            fail("Expected NullPointerException");
-        }
-        catch (NullPointerException expected)
-        {
-            assertEquals("A class must be provided for introspection.", expected.getMessage());
-        }
+        NullPointerException expected = assertThrows(NullPointerException.class, () ->
+            IntrospectedClass.introspect(null)
+        );
+        assertEquals("A class must be provided for introspection.", expected.getMessage());
     }
 
     @Test
