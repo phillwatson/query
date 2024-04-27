@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.UUID;
 
@@ -291,5 +292,16 @@ public class QueryPropertyTest {
         UUID value = UUID.randomUUID();
         fixture.applyTo(statement, 1, value.toString());
         verify(statement).setObject(1, value);
+    }
+
+    @Test
+    public void testToTypeCurrency() throws Exception {
+        PreparedStatement statement;
+
+        QueryProperty fixture = new QueryProperty("name", "col_name", Currency.class);
+
+        statement = spy(PreparedStatement.class);
+        fixture.applyTo(statement, 1, "GBP");
+        verify(statement).setString(1, "GBP");
     }
 }

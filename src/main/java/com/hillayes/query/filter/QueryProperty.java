@@ -30,10 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.OffsetTime;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a property that can be referenced in a filter expression.
@@ -67,6 +64,7 @@ public class QueryProperty implements Queryable {
         SUPPORTED_TYPES.put(BigInteger.class, (p, i, v) -> p.setLong(i, new BigInteger(v).longValue()));
         SUPPORTED_TYPES.put(BigDecimal.class, (p, i, v) -> p.setBigDecimal(i, new BigDecimal(v)));
         SUPPORTED_TYPES.put(String.class, PreparedStatement::setString);
+        SUPPORTED_TYPES.put(Currency.class, (p, i, v) -> p.setString(i, Currency.getInstance(v).getCurrencyCode()));
         SUPPORTED_TYPES.put(UUID.class, (p, i, v) -> p.setObject(i, UUID.fromString(v)));
         SUPPORTED_TYPES.put(java.util.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
         SUPPORTED_TYPES.put(java.sql.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
