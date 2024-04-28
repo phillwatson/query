@@ -1,5 +1,6 @@
 /target/
 /.settings/
+**/.flattened-pom.xml
 
 # Log file
 *.log
