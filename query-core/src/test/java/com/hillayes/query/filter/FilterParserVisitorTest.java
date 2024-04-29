@@ -29,8 +29,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -53,13 +52,13 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(7, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTNot);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTAnd);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTOr);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
-        assertTrue("was " + visited.get(5).getClass().getSimpleName(), visited.get(5) instanceof ASTComparison);
-        assertTrue("was " + visited.get(6).getClass().getSimpleName(), visited.get(6) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTNot.class, visited.get(1));
+        assertInstanceOf(ASTAnd.class, visited.get(2));
+        assertInstanceOf(ASTOr.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
+        assertInstanceOf(ASTComparison.class, visited.get(5));
+        assertInstanceOf(ASTComparison.class, visited.get(6));
     }
 
     @Test
@@ -76,11 +75,11 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(5, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTAnd);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTComparison);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTComparison);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTAnd.class, visited.get(1));
+        assertInstanceOf(ASTComparison.class, visited.get(2));
+        assertInstanceOf(ASTComparison.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
     }
 
     @Test
@@ -97,11 +96,11 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(5, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTOr);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTComparison);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTComparison);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTOr.class, visited.get(1));
+        assertInstanceOf(ASTComparison.class, visited.get(2));
+        assertInstanceOf(ASTComparison.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
     }
 
     @Test
@@ -118,14 +117,14 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(8, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTOr);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTAnd);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTComparison);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
-        assertTrue("was " + visited.get(5).getClass().getSimpleName(), visited.get(5) instanceof ASTAnd);
-        assertTrue("was " + visited.get(6).getClass().getSimpleName(), visited.get(6) instanceof ASTComparison);
-        assertTrue("was " + visited.get(7).getClass().getSimpleName(), visited.get(7) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTOr.class, visited.get(1));
+        assertInstanceOf(ASTAnd.class, visited.get(2));
+        assertInstanceOf(ASTComparison.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
+        assertInstanceOf(ASTAnd.class, visited.get(5));
+        assertInstanceOf(ASTComparison.class, visited.get(6));
+        assertInstanceOf(ASTComparison.class, visited.get(7));
     }
 
     @Test
@@ -134,7 +133,7 @@ public class FilterParserVisitorTest
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context,
-                                         "(property le 2 and property gt 4 or property eq 3) and property ne 5");
+            "(property le 2 and property gt 4 or property eq 3) and property ne 5");
         assertNotNull(filter);
 
         Visitor visitor = new Visitor();
@@ -143,14 +142,14 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(8, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTAnd);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTOr);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTAnd);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
-        assertTrue("was " + visited.get(5).getClass().getSimpleName(), visited.get(5) instanceof ASTComparison);
-        assertTrue("was " + visited.get(6).getClass().getSimpleName(), visited.get(6) instanceof ASTComparison);
-        assertTrue("was " + visited.get(7).getClass().getSimpleName(), visited.get(7) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTAnd.class, visited.get(1));
+        assertInstanceOf(ASTOr.class, visited.get(2));
+        assertInstanceOf(ASTAnd.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
+        assertInstanceOf(ASTComparison.class, visited.get(5));
+        assertInstanceOf(ASTComparison.class, visited.get(6));
+        assertInstanceOf(ASTComparison.class, visited.get(7));
     }
 
     @Test
@@ -159,7 +158,7 @@ public class FilterParserVisitorTest
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context,
-                                         "property le 2 and (property gt 4 or property eq 3 and property ne 5)");
+            "property le 2 and (property gt 4 or property eq 3 and property ne 5)");
         assertNotNull(filter);
 
         Visitor visitor = new Visitor();
@@ -168,14 +167,14 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(8, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTAnd);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTComparison);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTOr);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
-        assertTrue("was " + visited.get(5).getClass().getSimpleName(), visited.get(5) instanceof ASTAnd);
-        assertTrue("was " + visited.get(6).getClass().getSimpleName(), visited.get(6) instanceof ASTComparison);
-        assertTrue("was " + visited.get(7).getClass().getSimpleName(), visited.get(7) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTAnd.class, visited.get(1));
+        assertInstanceOf(ASTComparison.class, visited.get(2));
+        assertInstanceOf(ASTOr.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
+        assertInstanceOf(ASTAnd.class, visited.get(5));
+        assertInstanceOf(ASTComparison.class, visited.get(6));
+        assertInstanceOf(ASTComparison.class, visited.get(7));
     }
 
     @Test
@@ -185,7 +184,7 @@ public class FilterParserVisitorTest
 
         // precedence will be given to the OR
         Node filter = FilterParser.parse(context,
-                                         "property le 2 and (property gt 4 or property eq 3) and property ne 5");
+            "property le 2 and (property gt 4 or property eq 3) and property ne 5");
         assertNotNull(filter);
 
         Visitor visitor = new Visitor();
@@ -194,13 +193,13 @@ public class FilterParserVisitorTest
         List<Node> visited = visitor.getVisited();
         assertEquals(7, visited.size());
 
-        assertTrue("was " + visited.get(0).getClass().getSimpleName(), visited.get(0) instanceof ASTparse);
-        assertTrue("was " + visited.get(1).getClass().getSimpleName(), visited.get(1) instanceof ASTAnd);
-        assertTrue("was " + visited.get(2).getClass().getSimpleName(), visited.get(2) instanceof ASTComparison);
-        assertTrue("was " + visited.get(3).getClass().getSimpleName(), visited.get(3) instanceof ASTOr);
-        assertTrue("was " + visited.get(4).getClass().getSimpleName(), visited.get(4) instanceof ASTComparison);
-        assertTrue("was " + visited.get(5).getClass().getSimpleName(), visited.get(5) instanceof ASTComparison);
-        assertTrue("was " + visited.get(6).getClass().getSimpleName(), visited.get(6) instanceof ASTComparison);
+        assertInstanceOf(ASTparse.class, visited.get(0));
+        assertInstanceOf(ASTAnd.class, visited.get(1));
+        assertInstanceOf(ASTComparison.class, visited.get(2));
+        assertInstanceOf(ASTOr.class, visited.get(3));
+        assertInstanceOf(ASTComparison.class, visited.get(4));
+        assertInstanceOf(ASTComparison.class, visited.get(5));
+        assertInstanceOf(ASTComparison.class, visited.get(6));
     }
 
     private static class Visitor implements FilterParserVisitor
@@ -258,11 +257,6 @@ public class FilterParserVisitorTest
             aNode.childrenAccept(this, aData);
             return null;
         }
-    }
-
-    private void assertTrue(String aMessage, boolean aValue)
-    {
-        org.junit.jupiter.api.Assertions.assertTrue(aValue, aMessage);
     }
 
     /**
