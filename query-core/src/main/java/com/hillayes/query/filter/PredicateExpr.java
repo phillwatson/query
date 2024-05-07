@@ -33,12 +33,12 @@ import com.hillayes.query.filter.exceptions.InvalidPropertyRefException;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class Predicate {
+public class PredicateExpr {
     private final QueryContext context;
 
     private QueryProperty property;
 
-    private FilterFunction function;
+    private Function function;
 
     private String name;
 
@@ -48,7 +48,7 @@ public class Predicate {
 
     private boolean isNumeric;
 
-    public Predicate(QueryContext aContext) {
+    public PredicateExpr(QueryContext aContext) {
         context = aContext;
     }
 
@@ -57,7 +57,7 @@ public class Predicate {
      *
      * @return any function that was referenced in the comparison.
      */
-    public FilterFunction getFunction() {
+    public Function getFunction() {
         return function;
     }
 
@@ -66,7 +66,7 @@ public class Predicate {
      *
      * @param aValue the function to be set.
      */
-    public void setFunction(FilterFunction aValue) {
+    public void setFunction(Function aValue) {
         function = aValue;
     }
 
@@ -176,7 +176,7 @@ public class Predicate {
      * @return the value used in the comparison expression.
      */
     public String getValue() {
-        return value;
+        return (function != null) ? function.formatValue(value) : value;
     }
 
     /**

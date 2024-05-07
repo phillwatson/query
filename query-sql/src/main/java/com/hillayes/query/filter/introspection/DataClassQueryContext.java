@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.introspection;
 
-import com.hillayes.query.filter.Predicate;
+import com.hillayes.query.filter.PredicateExpr;
 import com.hillayes.query.filter.QueryClass;
 import com.hillayes.query.filter.QueryContext;
 import com.hillayes.query.filter.QueryProperty;
@@ -44,7 +44,7 @@ public class DataClassQueryContext implements QueryContext {
 
     private final StringBuilder query = new StringBuilder();
 
-    private final List<Predicate> predicates = new ArrayList<>();
+    private final List<PredicateExpr> predicates = new ArrayList<>();
 
     /**
      * Constructs a QueryContext that uses the introspection of the given data class as the basis
@@ -71,16 +71,16 @@ public class DataClassQueryContext implements QueryContext {
     }
 
     @Override
-    public Predicate newPredicate() {
+    public PredicateExpr newPredicate() {
         // create a new Predicate and add to ordered list
-        Predicate result = new Predicate(this);
+        PredicateExpr result = new PredicateExpr(this);
         predicates.add(result);
 
         return result;
     }
 
     @Override
-    public Iterable<? extends Predicate> getPredicates() {
+    public Iterable<? extends PredicateExpr> getPredicates() {
         return predicates;
     }
 

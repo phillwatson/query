@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.exceptions;
 
-import com.hillayes.query.filter.Predicate;
+import com.hillayes.query.filter.PredicateExpr;
 
 /**
  * Raised when the QueryContext deems a Predicate to be invalid.
@@ -31,7 +31,7 @@ import com.hillayes.query.filter.Predicate;
  * @since 1.0.0
  */
 public class InvalidComparisonException extends FilterException {
-    public InvalidComparisonException(Predicate aComparison) {
+    public InvalidComparisonException(PredicateExpr aComparison) {
         super(ErrorCode.INVALID_COMPARISON);
 
         getParameters().set("comparison", aComparison);
@@ -40,7 +40,7 @@ public class InvalidComparisonException extends FilterException {
     /**
      * @return the comparison that is deemed to be invalid.
      */
-    public Predicate getComparison() {
+    public PredicateExpr getComparison() {
         return getParameters().get("comparison");
     }
 }

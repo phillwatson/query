@@ -24,6 +24,10 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
+                <configuration>
+                    <visitorDataType>com.hillayes.query.filter.QueryPredicate</visitorDataType>
+                    <visitorReturnType>com.hillayes.query.filter.QueryPredicate</visitorReturnType>
+                </configuration>
             </plugin>
         </plugins>
     </build>

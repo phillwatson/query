@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -28,60 +28,14 @@ package com.hillayes.query.filter;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public enum FilterFunction
-{
-    LOWER(false), // convert named string property to LOWER-case
-    UPPER(false), // convert named string property to UPPER-case
-    CONTAINS(true), // test if named string property CONTAINS a given string
-    ENDSWITH(true), // test if named string property ends with a given string
-    STARTSWITH(true), // test if named string property starts with a given string
-    NOTNULL(false), // test if named property is NOT null
-    ISNULL(false); // test if named property is null
+public enum BiFunction implements Function {
+    CONTAINS, // test if named string property CONTAINS a given string
+    ENDSWITH, // test if named string property ends with a given string
+    STARTSWITH; // test if named string property starts with a given string
 
-    // true if the function takes a value (other than a property) as a parameter.
-    private final boolean takesValue;
-
-    private FilterFunction(boolean aTakesValue)
-    {
-        takesValue = aTakesValue;
-    }
-
-    /**
-     * Tests whether the function takes a value, other than the a property name, as a parameter.
-     *
-     * @return <code>true</code> if the function requires a value parameter.
-     */
-    public boolean takesValue()
-    {
-        return takesValue;
-    }
-
-    public void appendTo(StringBuilder aBuilder, String aColumnName)
-    {
-        switch (this)
-        {
-            case CONTAINS:
-            case ENDSWITH:
-            case STARTSWITH:
-                aBuilder.append(aColumnName).append(" like ?");
-                break;
-
-            case LOWER:
-                aBuilder.append("LOWER(").append(aColumnName).append(')');
-                break;
-
-            case UPPER:
-                aBuilder.append("UPPER(").append(aColumnName).append(')');
-                break;
-
-            case NOTNULL:
-                aBuilder.append(aColumnName).append(" is not null");
-                break;
-
-            case ISNULL:
-                aBuilder.append(aColumnName).append(" is null");
-                break;
-        }
+    @Override
+    public void appendTo(StringBuilder aBuilder, String aColumnName) {
+        aBuilder.append(aColumnName).append(" like ?");
     }
 
     /**
@@ -91,8 +45,8 @@ public enum FilterFunction
      * @param aValue the value to be formatted.
      * @return the formatted value.
      */
-    public String formatValue(String aValue)
-    {
+    @Override
+    public String formatValue(String aValue) {
         if (this == CONTAINS)
             return "%" + aValue.toLowerCase() + "%";
 

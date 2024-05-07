@@ -49,12 +49,12 @@ public interface QueryContext {
      *
      * @return a new, empty instance of Predicate.
      */
-    Predicate newPredicate();
+    PredicateExpr newPredicate();
 
     /**
      * Returns the list of predicates that have been created during the parsing of the filter.
      */
-    public Iterable<? extends Predicate> getPredicates();
+    public Iterable<? extends PredicateExpr> getPredicates();
 
     /**
      * Provides access to the StringBuilder used to construct the SQL query during parsing.

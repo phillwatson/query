@@ -36,25 +36,13 @@ public class FilterFunctionTest
     @Test
     public void testFormatValue()
     {
-        assertEquals("%value%", FilterFunction.CONTAINS.formatValue("VALUE"));
-        assertEquals("value%", FilterFunction.STARTSWITH.formatValue("VALUE"));
-        assertEquals("%value", FilterFunction.ENDSWITH.formatValue("VALUE"));
-        assertEquals("VALUE", FilterFunction.UPPER.formatValue("VALUE"));
-        assertEquals("VALUE", FilterFunction.LOWER.formatValue("VALUE"));
-        assertEquals("VALUE", FilterFunction.ISNULL.formatValue("VALUE"));
-        assertEquals("VALUE", FilterFunction.NOTNULL.formatValue("VALUE"));
-    }
-
-    @Test
-    public void testTakesValue()
-    {
-        assertTrue(FilterFunction.CONTAINS.takesValue());
-        assertTrue(FilterFunction.STARTSWITH.takesValue());
-        assertTrue(FilterFunction.ENDSWITH.takesValue());
-        assertFalse(FilterFunction.UPPER.takesValue());
-        assertFalse(FilterFunction.LOWER.takesValue());
-        assertFalse(FilterFunction.ISNULL.takesValue());
-        assertFalse(FilterFunction.NOTNULL.takesValue());
+        assertEquals("%value%", BiFunction.CONTAINS.formatValue("VALUE"));
+        assertEquals("value%", BiFunction.STARTSWITH.formatValue("VALUE"));
+        assertEquals("%value", BiFunction.ENDSWITH.formatValue("VALUE"));
+        assertEquals("VALUE", UnaryFunction.UPPER.formatValue("VALUE"));
+        assertEquals("VALUE", UnaryFunction.LOWER.formatValue("VALUE"));
+        assertEquals("VALUE", BoolFunction.ISNULL.formatValue("VALUE"));
+        assertEquals("VALUE", BoolFunction.NOTNULL.formatValue("VALUE"));
     }
 
     @Test
@@ -63,31 +51,31 @@ public class FilterFunctionTest
         StringBuilder result = new StringBuilder();
 
         result.setLength(0);
-        FilterFunction.CONTAINS.appendTo(result, "col");
+        BiFunction.CONTAINS.appendTo(result, "col");
         assertEquals("col like ?", result.toString());
 
         result.setLength(0);
-        FilterFunction.STARTSWITH.appendTo(result, "col");
+        BiFunction.STARTSWITH.appendTo(result, "col");
         assertEquals("col like ?", result.toString());
 
         result.setLength(0);
-        FilterFunction.ENDSWITH.appendTo(result, "col");
+        BiFunction.ENDSWITH.appendTo(result, "col");
         assertEquals("col like ?", result.toString());
 
         result.setLength(0);
-        FilterFunction.LOWER.appendTo(result, "col");
+        UnaryFunction.LOWER.appendTo(result, "col");
         assertEquals("LOWER(col)", result.toString());
 
         result.setLength(0);
-        FilterFunction.UPPER.appendTo(result, "col");
+        UnaryFunction.UPPER.appendTo(result, "col");
         assertEquals("UPPER(col)", result.toString());
 
         result.setLength(0);
-        FilterFunction.ISNULL.appendTo(result, "col");
+        BoolFunction.ISNULL.appendTo(result, "col");
         assertEquals("col is null", result.toString());
 
         result.setLength(0);
-        FilterFunction.NOTNULL.appendTo(result, "col");
+        BoolFunction.NOTNULL.appendTo(result, "col");
         assertEquals("col is not null", result.toString());
     }
 }

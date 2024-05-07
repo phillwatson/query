@@ -1,7 +1,7 @@
 /**
  * [Phillip Watson] ("COMPANY") CONFIDENTIAL Unpublished Copyright © 2019-2020 Phillip Watson,
  * All Rights Reserved.
- *
+ * <p>
  * NOTICE: All information contained herein is, and remains the property of COMPANY. The
  * intellectual and technical concepts contained herein are proprietary to COMPANY and may be
  * covered by U.K. and Foreign Patents, patents in process, and are protected by trade secret or
@@ -10,7 +10,7 @@
  * contained herein is hereby forbidden to anyone except current COMPANY employees, managers or
  * contractors who have executed Confidentiality and Non-disclosure agreements explicitly covering
  * such access.
- *
+ * <p>
  * The copyright notice above does not evidence any actual or intended publication or disclosure of
  * this source code, which includes information that is confidential and/or proprietary, and is a
  * trade secret, of COMPANY. ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC PERFORMANCE, OR
@@ -36,11 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class FilterParserVisitorTest
-{
+public class FilterParserVisitorTest {
     @Test
-    public void testNotComplex() throws Exception
-    {
+    public void testNotComplex() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context, "not (property le 2 or property gt 4) and property eq 3");
@@ -62,8 +60,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMultiAnd() throws Exception
-    {
+    public void testMultiAnd() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context, "property le 2 and property gt 4 and property eq 3");
@@ -83,8 +80,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMultiOr() throws Exception
-    {
+    public void testMultiOr() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context, "property le 2 or property gt 4 or property eq 3");
@@ -104,8 +100,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMixAndOr() throws Exception
-    {
+    public void testMixAndOr() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context, "property le 2 and property gt 4 or property eq 3 and property ne 5");
@@ -128,8 +123,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMixAndOrBrackets() throws Exception
-    {
+    public void testMixAndOrBrackets() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context,
@@ -153,8 +147,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMixOrAndBrackets() throws Exception
-    {
+    public void testMixOrAndBrackets() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         Node filter = FilterParser.parse(context,
@@ -178,8 +171,7 @@ public class FilterParserVisitorTest
     }
 
     @Test
-    public void testMixOrAndBrackets2() throws Exception
-    {
+    public void testMixOrAndBrackets2() throws Exception {
         MockQueryContext context = new MockQueryContext();
 
         // precedence will be given to the OR
@@ -202,57 +194,49 @@ public class FilterParserVisitorTest
         assertInstanceOf(ASTComparison.class, visited.get(6));
     }
 
-    private static class Visitor implements FilterParserVisitor
-    {
+    private static class Visitor extends FilterParserDefaultVisitor {
         private final List<Node> visited = new ArrayList<>();
 
-        public List<Node> getVisited()
-        {
+        public List<Node> getVisited() {
             return visited;
         }
 
         @Override
-        public Object visit(SimpleNode aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(SimpleNode aNode, com.hillayes.query.filter.QueryPredicate aData) {
             // never used
             throw new RuntimeException("Didn't expect this visit.");
         }
 
         @Override
-        public Object visit(ASTparse aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(ASTparse aNode, com.hillayes.query.filter.QueryPredicate aData) {
             visited.add(aNode);
             aNode.childrenAccept(this, aData);
             return null;
         }
 
         @Override
-        public Object visit(ASTOr aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(ASTOr aNode, com.hillayes.query.filter.QueryPredicate aData) {
             visited.add(aNode);
             aNode.childrenAccept(this, aData);
             return null;
         }
 
         @Override
-        public Object visit(ASTAnd aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(ASTAnd aNode, com.hillayes.query.filter.QueryPredicate aData) {
             visited.add(aNode);
             aNode.childrenAccept(this, aData);
             return null;
         }
 
         @Override
-        public Object visit(ASTNot aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(ASTNot aNode, com.hillayes.query.filter.QueryPredicate aData) {
             visited.add(aNode);
             aNode.childrenAccept(this, aData);
             return null;
         }
 
         @Override
-        public Object visit(ASTComparison aNode, Object aData)
-        {
+        public com.hillayes.query.filter.QueryPredicate visit(ASTComparison aNode, com.hillayes.query.filter.QueryPredicate aData) {
             visited.add(aNode);
             aNode.childrenAccept(this, aData);
             return null;
@@ -263,8 +247,7 @@ public class FilterParserVisitorTest
      * A mock implementation of QueryContext to keep a record of the PropertyComparisons generated
      * during parsing.
      */
-    private static class MockQueryContext implements QueryContext
-    {
+    private static class MockQueryContext implements QueryContext {
         private final StringBuilder query = new StringBuilder();
 
         @Override
@@ -273,25 +256,22 @@ public class FilterParserVisitorTest
         }
 
         @Override
-        public Predicate newPredicate()
-        {
-            return new Predicate(this);
+        public PredicateExpr newPredicate() {
+            return new PredicateExpr(this);
         }
 
         @Override
-        public StringBuilder queryBuilder()
-        {
+        public StringBuilder queryBuilder() {
             return query;
         }
 
         @Override
-        public QueryProperty getPropertyFor(String aName)
-        {
+        public QueryProperty getPropertyFor(String aName) {
             return Mockito.mock(QueryProperty.class);
         }
 
         @Override
-        public Iterable<? extends Predicate> getPredicates() {
+        public Iterable<? extends PredicateExpr> getPredicates() {
             return null;
         }
     }

@@ -35,14 +35,14 @@ import static org.mockito.Mockito.when;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public class PredicateTest {
+public class PredicateExprTest {
     @Test
     public void testFunction() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getFunction());
-        fixture.setFunction(FilterFunction.CONTAINS);
-        assertEquals(FilterFunction.CONTAINS, fixture.getFunction());
+        fixture.setFunction(BiFunction.CONTAINS);
+        assertEquals(BiFunction.CONTAINS, fixture.getFunction());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class PredicateTest {
         QueryContext mockContext = Mockito.mock(QueryContext.class);
         when(mockContext.getPropertyFor(anyString())).thenReturn(Mockito.mock(QueryProperty.class));
 
-        Predicate fixture = new Predicate(mockContext);
+        PredicateExpr fixture = new PredicateExpr(mockContext);
 
         assertNull(fixture.getName());
         fixture.setName("property");
@@ -62,13 +62,13 @@ public class PredicateTest {
         QueryContext mockContext = Mockito.mock(QueryContext.class);
         when(mockContext.getPropertyFor(anyString())).thenReturn(null);
 
-        Predicate fixture = new Predicate(mockContext);
+        PredicateExpr fixture = new PredicateExpr(mockContext);
         assertThrows(InvalidPropertyRefException.class, () -> fixture.setName("property"));
     }
 
     @Test
     public void testOperator() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getOperator());
         fixture.setOperator(Operator.GE);
@@ -77,7 +77,7 @@ public class PredicateTest {
 
     @Test
     public void testString() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getValue());
         fixture.setString("value1");
@@ -87,7 +87,7 @@ public class PredicateTest {
 
     @Test
     public void testStringSingleQuote() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getValue());
         fixture.setString("'value2'");
@@ -97,7 +97,7 @@ public class PredicateTest {
 
     @Test
     public void testStringDoubleQuote() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getValue());
         fixture.setString("\"value3\"");
@@ -107,7 +107,7 @@ public class PredicateTest {
 
     @Test
     public void testNumber() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getValue());
         fixture.setNumber("999");
@@ -117,7 +117,7 @@ public class PredicateTest {
 
     @Test
     public void testIdentifier() throws Exception {
-        Predicate fixture = new Predicate(null);
+        PredicateExpr fixture = new PredicateExpr(null);
 
         assertNull(fixture.getValue());
         fixture.setIdentifier("Property");

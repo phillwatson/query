@@ -259,7 +259,7 @@ public class QueryConstraints {
      */
     public void applyArgs(PreparedStatement aStatement) throws SQLException {
         int argIndex = 1;
-        for (Predicate predicate : context.getPredicates()) {
+        for (PredicateExpr predicate : context.getPredicates()) {
             argIndex = applyArg(predicate, aStatement, argIndex);
         }
     }
@@ -277,14 +277,12 @@ public class QueryConstraints {
      * statement; if a database access error occurs or this method is called on a closed
      * PreparedStatement
      */
-    private int applyArg(Predicate aPredicate, PreparedStatement aStatement, int aArgIndex) throws SQLException {
+    private int applyArg(PredicateExpr aPredicate, PreparedStatement aStatement, int aArgIndex) throws SQLException {
         // if the expression references a value
-        if ((aPredicate.getOperator() != null) || ((aPredicate.getFunction() != null) && (aPredicate.getFunction().takesValue()))) {
+        if ((aPredicate.getOperator() != null) || (aPredicate.getFunction() instanceof BiFunction)) {
             // apply the formatted property value to the statement
             IntrospectedProperty prop = (IntrospectedProperty)aPredicate.getProperty();
-            prop.applyTo(aStatement, aArgIndex++, (aPredicate.getFunction() != null)
-                ? aPredicate.getFunction().formatValue(aPredicate.getValue())
-                : aPredicate.getValue());
+            prop.applyTo(aStatement, aArgIndex++, aPredicate.getValue());
         }
 
         return aArgIndex;

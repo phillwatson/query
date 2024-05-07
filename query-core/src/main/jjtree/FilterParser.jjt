@@ -17,8 +17,6 @@ options {
   SANITY_CHECK = true;
   KEEP_LINE_COLUMN = false;
   VISITOR = true;
-  VISITOR_DATA_TYPE = "Object";
-  VISITOR_RETURN_TYPE = "Object";
   MULTI = true;
 }
 
@@ -49,11 +47,14 @@ package com.hillayes.query.filter.parser;
 
 import java.io.StringReader;
 
-import com.hillayes.query.filter.FilterFunction;
+import com.hillayes.query.filter.BiFunction;
+import com.hillayes.query.filter.BoolFunction;
 import com.hillayes.query.filter.exceptions.InvalidComparisonException;
 import com.hillayes.query.filter.Operator;
-import com.hillayes.query.filter.Predicate;
+import com.hillayes.query.filter.PredicateExpr;
 import com.hillayes.query.filter.QueryContext;
+import com.hillayes.query.filter.QueryPredicate;
+import com.hillayes.query.filter.UnaryFunction;
 
 /**
  * The starting point for parsing a query filter. This should not be instantiated
@@ -91,14 +92,14 @@ public class FilterParser
      * These nodes can, and should, be traversed using an instance of the interface
      * {@link FilterParserVisitor}. Perhaps the most important method of this
      * interface is {@link FilterParserVisitor#visit(ASTComparison, Object)}.
-     * The given ASTComparison object holds an instance of Predicate
+     * The given ASTComparison object holds an instance of PredicateExpr
      * that fully describes the comparison; the named property, function (if
      * any), the operator (if any) and the value (if any). From this the
      * implementation should be able to construct the equivalent comparison in
      * whatever target notation it requires (e.g. SQL or JPA).
      * 
      * @param aContext the QueryContext implementation that will be used to
-     * validate the generated Predicate.
+     * validate the generated PredicateExpr.
      * @param aFilter the REST URL query filter expression to be parsed.
      * @return the root node of the parsed filter expression.
      */
@@ -176,7 +177,7 @@ Node parse(QueryContext aContext) throws InvalidComparisonException : { }
 void orExpression(QueryContext aContext) throws InvalidComparisonException #void : { }
 {
     // return either a single expression node
-    // or multple expression nodes enclosed in an OR node 
+    // or multiple expression nodes enclosed in an OR node 
     (
       andExpression(aContext)
       (
@@ -193,7 +194,7 @@ void orExpression(QueryContext aContext) throws InvalidComparisonException #void
 void andExpression(QueryContext aContext) throws InvalidComparisonException #void : { }
 {
     // return either a single expression node
-    // or multple expression nodes enclosed in an AND node 
+    // or multiple expression nodes enclosed in an AND node 
     (
       expression(aContext)
       (
@@ -221,21 +222,25 @@ void expression(QueryContext aContext) throws InvalidComparisonException #void :
 
     | (
         <LPAREN> { aContext.queryBuilder().append('('); }
-        orExpression(aContext)
+        orExpression(aContext) #LParen
         <RPAREN> { aContext.queryBuilder().append(')'); }
       )
 }
 
 /**
  * The start of a comparison. This will call the QueryContext to create a new
- * Predicate, and then populate that Predicate before asking
+ * PredicateExpr, and then populate that PredicateExpr before asking
  * the QueryComparison to validate it. If the QueryComparison says it's invalid,
  * a InvalidComparisonException will be raised.
  */
-void Comparison(QueryContext aContext) throws InvalidComparisonException: { Predicate predicate = aContext.newPredicate(); }
+void Comparison(QueryContext aContext) throws InvalidComparisonException: { PredicateExpr predicate = aContext.newPredicate(); }
 {
     // look for a null function, boolean function or a comparison expression
-    ( NullFunction(aContext, predicate) | BooleanFunction(aContext, predicate) | PredicateExpr(aContext, predicate) )
+    (
+        NullFunction(aContext, predicate)
+      | BiFunction(aContext, predicate)
+      | PredicateExpr(aContext, predicate)
+    )
 
     {
       // validate the resulting expression
@@ -243,7 +248,7 @@ void Comparison(QueryContext aContext) throws InvalidComparisonException: { Pred
          throw new InvalidComparisonException(predicate);
       }
 
-      // record the Predicate in the resulting ASTComparison node
+      // record the PredicateExpr in the resulting ASTComparison node
       jjtThis.jjtSetValue(predicate);
       
       predicate.appendTo(aContext.queryBuilder());
@@ -251,18 +256,18 @@ void Comparison(QueryContext aContext) throws InvalidComparisonException: { Pred
 }
 
 /**
- * Looks for one of the possible NULL expressions and populates the given
- * Predicate with the name of the function, the name of the property
+ * Looks for one of the possible boolean functions and populates the given
+ * PredicateExpr with the name of the function and the name of the property
  * to be passed to the function. The format is expected to be:
  *
  *    function(property)
  */
-void NullFunction(QueryContext aContext, Predicate aPredicate) #void : { }
+void NullFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
 {
     (
       // look for one of the known functions and record its name
-        <ISNULL>  { aPredicate.setFunction(FilterFunction.ISNULL); }
-      | <NOTNULL> { aPredicate.setFunction(FilterFunction.NOTNULL); }
+        <ISNULL>  { aPredicate.setFunction(BoolFunction.ISNULL); }
+      | <NOTNULL> { aPredicate.setFunction(BoolFunction.NOTNULL); }
     )
 
     <LPAREN>
@@ -272,19 +277,19 @@ void NullFunction(QueryContext aContext, Predicate aPredicate) #void : { }
 }
 
 /**
- * Looks for one of the possible boolean expressions and populates the given
- * Predicate with the name of the function, the name of the property
+ * Looks for one of the possible bi-arg functions and populates the given
+ * PredicateExpr with the name of the function, the name of the property
  * and the value to be passed to the function. The format is expected to be:
  *
  *    function(property, value)
  */
-void BooleanFunction(QueryContext aContext, Predicate aPredicate) #void : { }
+void BiFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
 {
     (
       // look for one of the known functions and record its name
-        <CONTAINS>   { aPredicate.setFunction(FilterFunction.CONTAINS); }
-      | <ENDSWITH>   { aPredicate.setFunction(FilterFunction.ENDSWITH); }
-      | <STARTSWITH> { aPredicate.setFunction(FilterFunction.STARTSWITH); }
+        <CONTAINS>   { aPredicate.setFunction(BiFunction.CONTAINS); }
+      | <ENDSWITH>   { aPredicate.setFunction(BiFunction.ENDSWITH); }
+      | <STARTSWITH> { aPredicate.setFunction(BiFunction.STARTSWITH); }
     )
 
     <LPAREN>
@@ -298,7 +303,7 @@ void BooleanFunction(QueryContext aContext, Predicate aPredicate) #void : { }
 
 /**
  * Looks for a comparison, with a possible function applied to the named
- * property. It will populate the given Predicate with attributes
+ * property. It will populate the given PredicateExpr with attributes
  * of the comparison (function name, property name, operator and value).
  * The format is expected to be:
  *
@@ -306,7 +311,7 @@ void BooleanFunction(QueryContext aContext, Predicate aPredicate) #void : { }
  * or
  *    property operator value
  */
-void PredicateExpr(QueryContext aContext, Predicate aPredicate) #void : { }
+void PredicateExpr(QueryContext aContext, PredicateExpr aPredicate) #void : { }
 {
     (
       // look for either a function OR a property name and record the info
@@ -334,16 +339,16 @@ void PredicateExpr(QueryContext aContext, Predicate aPredicate) #void : { }
 
 /**
  * Looks for one of the possible functions that take a single named property
- * as a parameter, and populates the given Predicate with the name of
+ * as a parameter, and populates the given PredicateExpr with the name of
  * that function and the name of the property. The format is expected to be:
  *
  *    function(property)
  */
-void UnaryFunction(QueryContext aContext, Predicate aPredicate) #void : { }
+void UnaryFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
 {
     (
-        <TOLOWER> { aPredicate.setFunction(FilterFunction.LOWER); }
-      | <TOUPPER> { aPredicate.setFunction(FilterFunction.UPPER); }
+        <TOLOWER> { aPredicate.setFunction(UnaryFunction.LOWER); }
+      | <TOUPPER> { aPredicate.setFunction(UnaryFunction.UPPER); }
     )
     
     <LPAREN>
