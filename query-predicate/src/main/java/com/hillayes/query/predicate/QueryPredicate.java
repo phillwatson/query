@@ -1,4 +1,4 @@
-package com.hillayes.query.filter;
+package com.hillayes.query.predicate;
 
 public interface QueryPredicate {
     boolean test();

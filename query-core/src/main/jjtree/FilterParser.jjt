@@ -47,18 +47,13 @@ package com.hillayes.query.filter.parser;
 
 import java.io.StringReader;
 
-import com.hillayes.query.filter.BiFunction;
-import com.hillayes.query.filter.BoolFunction;
 import com.hillayes.query.filter.exceptions.InvalidComparisonException;
-import com.hillayes.query.filter.Operator;
-import com.hillayes.query.filter.PredicateExpr;
-import com.hillayes.query.filter.QueryContext;
-import com.hillayes.query.filter.QueryPredicate;
-import com.hillayes.query.filter.UnaryFunction;
+import com.hillayes.query.filter.expression.*;
+import com.hillayes.query.filter.function.*;
 
 /**
  * The starting point for parsing a query filter. This should not be instantiated
- * but, rather, the static method {@link #parse(QueryContext, String)} should be
+ * but, rather, the static method {@link #parse(String)} should be
  * used to perform the parsing.
  *
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
@@ -68,14 +63,14 @@ public class FilterParser
 {
     /**
      * This is the preferred method of parsing a query filter. It will parse the
-     * given filter expression and, using the given QueryContext, create a node
-     * tree that represents the elements of that filter expression.
+     * given filter expression and create a node tree that represents the elements
+     * of that filter expression.
      * <p>
      * The hierarchy of the nodes in the generated node tree represents the order
      * of precedence of the expressions within the filter; with the lower order
      * nodes appearing first. For example; the operator OR has a lower order then
      * the AND operator so, in the expression "a eq 2 and b gt 3 or c lt 4" the
-     * tree hierachy would be:
+     * tree hierarchy would be:
      * <pre>
      *  Or
      *    And
@@ -92,22 +87,20 @@ public class FilterParser
      * These nodes can, and should, be traversed using an instance of the interface
      * {@link FilterParserVisitor}. Perhaps the most important method of this
      * interface is {@link FilterParserVisitor#visit(ASTComparison, Object)}.
-     * The given ASTComparison object holds an instance of PredicateExpr
+     * The given ASTComparison object holds an instance of Expression
      * that fully describes the comparison; the named property, function (if
      * any), the operator (if any) and the value (if any). From this the
      * implementation should be able to construct the equivalent comparison in
      * whatever target notation it requires (e.g. SQL or JPA).
      * 
-     * @param aContext the QueryContext implementation that will be used to
-     * validate the generated PredicateExpr.
      * @param aFilter the REST URL query filter expression to be parsed.
      * @return the root node of the parsed filter expression.
      */
-    public static Node parse(QueryContext aContext, String aFilter) throws ParseException, TokenMgrError, InvalidComparisonException
+    public static Node parse(String aFilter) throws ParseException, TokenMgrError, InvalidComparisonException
     {
         if ((aFilter != null) && (aFilter.length() > 0)) {
             FilterParser parser = new FilterParser(new StringReader(aFilter));
-            return parser.parse(aContext);
+            return parser.parse();
         }
 
         return(null);
@@ -164,9 +157,9 @@ TOKEN: /* LITERALS */
  * determine the order of precedence given to the AND, OR and NOT operators,
  * and how brackets can be used to override that precedence order.
  */
-Node parse(QueryContext aContext) throws InvalidComparisonException : { }
+Node parse() throws InvalidComparisonException : { }
 {
-    orExpression(aContext) <EOF>
+    orExpression() <EOF>
     { return jjtThis; }
 }
 
@@ -174,15 +167,15 @@ Node parse(QueryContext aContext) throws InvalidComparisonException : { }
  * Looks for a sequence of "andExpression" nodes and, if more than one, will
  * combine them under an "or" node.
  */
-void orExpression(QueryContext aContext) throws InvalidComparisonException #void : { }
+void orExpression() throws InvalidComparisonException #void : { }
 {
     // return either a single expression node
     // or multiple expression nodes enclosed in an OR node 
     (
-      andExpression(aContext)
+      andExpression()
       (
-        <OR> { aContext.queryBuilder().append(" OR "); }
-        andExpression(aContext)
+        <OR>
+        andExpression()
       )*
     ) #Or(>1)
 }
@@ -191,15 +184,15 @@ void orExpression(QueryContext aContext) throws InvalidComparisonException #void
  * Looks for a sequence of "expression" nodes and, if more than one, will
  * combine them under an "and" node.
  */
-void andExpression(QueryContext aContext) throws InvalidComparisonException #void : { }
+void andExpression() throws InvalidComparisonException #void : { }
 {
     // return either a single expression node
     // or multiple expression nodes enclosed in an AND node 
     (
-      expression(aContext)
+      expression()
       (
-        <AND> { aContext.queryBuilder().append(" AND "); }
-        expression(aContext)
+        <AND>
+        expression()
       )*
     ) #And(>1)
 }
@@ -208,102 +201,105 @@ void andExpression(QueryContext aContext) throws InvalidComparisonException #voi
  * Looks for a comparison expression or a NOT comparison expression or a
  * sequence of expression contained within brackets.
  */
-void expression(QueryContext aContext) throws InvalidComparisonException #void : { }
+void expression() throws InvalidComparisonException #void : { }
 {
     // return either a comparison node
     // or a comparison node enclosed in a NOT node
     // or the start of a new expression enclosed in brackets
-    Comparison(aContext)
+    Comparison()
 
     | (
-        <NOT> { aContext.queryBuilder().append("NOT "); }
-        orExpression(aContext) #Not
+        <NOT>
+        orExpression() #Not
       )
 
     | (
-        <LPAREN> { aContext.queryBuilder().append('('); }
-        orExpression(aContext) #LParen
-        <RPAREN> { aContext.queryBuilder().append(')'); }
+        <LPAREN>
+        orExpression() #LParen
+        <RPAREN>
       )
 }
 
 /**
- * The start of a comparison. This will call the QueryContext to create a new
- * PredicateExpr, and then populate that PredicateExpr before asking
- * the QueryComparison to validate it. If the QueryComparison says it's invalid,
- * a InvalidComparisonException will be raised.
+ * The start of a comparison. This create a new Expression, and then populate
+ * that Expression by passing it to the subsequent parsing methods.
  */
-void Comparison(QueryContext aContext) throws InvalidComparisonException: { PredicateExpr predicate = aContext.newPredicate(); }
+void Comparison() throws InvalidComparisonException: { Expression expression = new Expression(); }
 {
     // look for a null function, boolean function or a comparison expression
     (
-        NullFunction(aContext, predicate)
-      | BiFunction(aContext, predicate)
-      | PredicateExpr(aContext, predicate)
+        NullFunction(expression)
+      | BiFunction(expression)
+      | Expression(expression)
     )
 
     {
-      // validate the resulting expression
-      if (! predicate.isValid()) {
-         throw new InvalidComparisonException(predicate);
-      }
-
-      // record the PredicateExpr in the resulting ASTComparison node
-      jjtThis.jjtSetValue(predicate);
-      
-      predicate.appendTo(aContext.queryBuilder());
+      // record the Expression in the resulting ASTComparison node
+      jjtThis.jjtSetValue(expression);
     }
 }
 
 /**
  * Looks for one of the possible boolean functions and populates the given
- * PredicateExpr with the name of the function and the name of the property
+ * Expression with the name of the function and the name of the property
  * to be passed to the function. The format is expected to be:
  *
  *    function(property)
  */
-void NullFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
+void NullFunction(Expression aExpression) #void : { }
 {
+    { FunctionArgument function = null; }
+
     (
       // look for one of the known functions and record its name
-        <ISNULL>  { aPredicate.setFunction(BoolFunction.ISNULL); }
-      | <NOTNULL> { aPredicate.setFunction(BoolFunction.NOTNULL); }
+        <ISNULL>  { function = new FunctionArgument(BoolFunction.ISNULL); }
+      | <NOTNULL> { function = new FunctionArgument(BoolFunction.NOTNULL); }
     )
 
     <LPAREN>
     // look for a property name parameter to the function
-    <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
+    <IDENTIFIER> { function.addArgument(new PropertyArgument(getToken(0).image)); }
     <RPAREN>
+
+    {
+        aExpression.setLeftArg(function);
+    }
 }
 
 /**
  * Looks for one of the possible bi-arg functions and populates the given
- * PredicateExpr with the name of the function, the name of the property
+ * Expression with the name of the function, the name of the property
  * and the value to be passed to the function. The format is expected to be:
  *
  *    function(property, value)
  */
-void BiFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
+void BiFunction(Expression aExpression) #void : { }
 {
+    { FunctionArgument function = null; }
+
     (
       // look for one of the known functions and record its name
-        <CONTAINS>   { aPredicate.setFunction(BiFunction.CONTAINS); }
-      | <ENDSWITH>   { aPredicate.setFunction(BiFunction.ENDSWITH); }
-      | <STARTSWITH> { aPredicate.setFunction(BiFunction.STARTSWITH); }
+        <CONTAINS>   { function = new FunctionArgument(BiFunction.CONTAINS); }
+      | <ENDSWITH>   { function = new FunctionArgument(BiFunction.ENDSWITH); }
+      | <STARTSWITH> { function = new FunctionArgument(BiFunction.STARTSWITH); }
     )
 
     <LPAREN>
     // look for a property name parameter to the function
-    <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
+    <IDENTIFIER> { function.addArgument(new PropertyArgument(getToken(0).image)); }
     <COMMA>
     // look for the value parameter to the function
-    <QUOTED_TEXT> { aPredicate.setString(getToken(0).image); }
+    <QUOTED_TEXT> { function.addArgument(new StringArgument(getToken(0).image)); }
     <RPAREN>
+
+    {
+        aExpression.setLeftArg(function);
+    }
 }
 
 /**
  * Looks for a comparison, with a possible function applied to the named
- * property. It will populate the given PredicateExpr with attributes
+ * property. It will populate the given Expression with attributes
  * of the comparison (function name, property name, operator and value).
  * The format is expected to be:
  *
@@ -311,47 +307,54 @@ void BiFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
  * or
  *    property operator value
  */
-void PredicateExpr(QueryContext aContext, PredicateExpr aPredicate) #void : { }
+void Expression(Expression aExpression) #void : { }
 {
     (
       // look for either a function OR a property name and record the info
-        UnaryFunction(aContext, aPredicate)
-      | <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
+        UnaryFunction(aExpression)
+      | <IDENTIFIER> { aExpression.setLeftArg(new PropertyArgument(getToken(0).image)); }
     )
 
     (
       // record the operator to be applied
-        <EQ> { aPredicate.setOperator(Operator.EQ); }
-      | <NE> { aPredicate.setOperator(Operator.NE); }
-      | <GT> { aPredicate.setOperator(Operator.GT); }
-      | <LT> { aPredicate.setOperator(Operator.LT); }
-      | <GE> { aPredicate.setOperator(Operator.GE); }
-      | <LE> { aPredicate.setOperator(Operator.LE); }
+        <EQ> { aExpression.setOperator(Operator.EQ); }
+      | <NE> { aExpression.setOperator(Operator.NE); }
+      | <GT> { aExpression.setOperator(Operator.GT); }
+      | <LT> { aExpression.setOperator(Operator.LT); }
+      | <GE> { aExpression.setOperator(Operator.GE); }
+      | <LE> { aExpression.setOperator(Operator.LE); }
     )
 
     (
-      // look for either an enum constant, a quoted string or a number
-        <IDENTIFIER>  { aPredicate.setIdentifier(getToken(0).image); }
-      | <QUOTED_TEXT> { aPredicate.setString(getToken(0).image); }
-      | <NUMERIC>     { aPredicate.setNumber(getToken(0).image); }
+      // look for either a property, quoted string or number
+        <IDENTIFIER>  { aExpression.setRightArg(new PropertyArgument(getToken(0).image)); }
+      | <QUOTED_TEXT> { aExpression.setRightArg(new StringArgument(getToken(0).image)); }
+      | <NUMERIC>     { aExpression.setRightArg(new NumericArgument(getToken(0).image)); }
     )
 }
 
 /**
  * Looks for one of the possible functions that take a single named property
- * as a parameter, and populates the given PredicateExpr with the name of
- * that function and the name of the property. The format is expected to be:
+ * as a parameter, and populates the given Expression with the name of
+ * that function and the name of the property or a string constant. The format
+ * is expected to be:
  *
  *    function(property)
  */
-void UnaryFunction(QueryContext aContext, PredicateExpr aPredicate) #void : { }
+void UnaryFunction(Expression aExpression) #void : { }
 {
+    { FunctionArgument function = null; }
+
     (
-        <TOLOWER> { aPredicate.setFunction(UnaryFunction.LOWER); }
-      | <TOUPPER> { aPredicate.setFunction(UnaryFunction.UPPER); }
+        <TOLOWER> { function = new FunctionArgument(UnaryFunction.LOWER); }
+      | <TOUPPER> { function = new FunctionArgument(UnaryFunction.UPPER); }
     )
-    
+
     <LPAREN>
-    <IDENTIFIER> { aPredicate.setName(getToken(0).image); }
+    <IDENTIFIER> { function.addArgument(new PropertyArgument(getToken(0).image)); }
     <RPAREN>
+
+    {
+        aExpression.setLeftArg(function);
+    }
 }

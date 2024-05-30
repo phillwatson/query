@@ -130,21 +130,30 @@ public class IntrospectedClass extends QueryClass {
             Method method = descriptor.getMethod();
             String name = method.getName();
 
-            // if it's a Boolean whose name starts with "is"
-            if ((method.getReturnType() == Boolean.class) && (name.startsWith("is"))) {
-                // if the method does NOT hold the requried annotation
-                FilterProperty filterProperty = method.getAnnotation(FilterProperty.class);
-                if (filterProperty == null) {
-                    continue;
-                }
-
-                // remove leading "is" and change capitalization
-                name = Strings.isEmpty(filterProperty.name())
-                    ? Introspector.decapitalize(name.substring(2))
-                    : filterProperty.name();
-
-                addProperty(name, new IntrospectedProperty(filterProperty, name, Boolean.class));
+            // if it's NOT a Boolean
+            if ((method.getReturnType() != Boolean.class) &&
+                (method.getReturnType() != boolean.class)) {
+                continue;
             }
+
+            // if the method does NOT hold the required annotation
+            FilterProperty filterProperty = method.getAnnotation(FilterProperty.class);
+            if (filterProperty == null) {
+                continue;
+            }
+
+            // if name starts with "is" or "has"
+            int prefixLen = 0;
+            if (name.startsWith("is")) prefixLen = 2;
+            else if (name.startsWith("has")) prefixLen = 3;
+            else continue; // "get" will be detected by the property descriptors
+
+            // remove prefix and change capitalization
+            name = Strings.isEmpty(filterProperty.name())
+                ? Introspector.decapitalize(name.substring(prefixLen))
+                : filterProperty.name();
+
+            addProperty(name, new IntrospectedProperty(filterProperty, name, Boolean.class, method));
         }
     }
 

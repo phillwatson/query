@@ -47,7 +47,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeString() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", String.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", String.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", String.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "String Value");
@@ -57,7 +57,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToType_boolean() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", boolean.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", boolean.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", boolean.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "True");
@@ -71,7 +71,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeBoolean() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Boolean.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Boolean.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Boolean.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "True");
@@ -85,7 +85,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeByte() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Byte.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Byte.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Byte.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "123");
@@ -95,7 +95,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToType_byte() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", byte.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", byte.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", byte.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "123");
@@ -105,7 +105,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeInteger() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Integer.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Integer.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Integer.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -115,7 +115,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeInt() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", int.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", int.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", int.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -125,7 +125,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeLong() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Long.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Long.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Long.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -135,7 +135,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToType_long() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", long.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", long.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", long.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -145,7 +145,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeBigInteger() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", BigInteger.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", BigInteger.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", BigInteger.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999");
@@ -155,7 +155,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeBigDecimal() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", BigDecimal.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", BigDecimal.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", BigDecimal.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         BigDecimal value = new BigDecimal("999.99");
@@ -166,7 +166,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeDouble() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Double.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Double.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Double.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -176,7 +176,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToType_double() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", double.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", double.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", double.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -186,7 +186,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeFloat() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Float.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Float.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Float.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -196,7 +196,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToType_float() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", float.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", float.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", float.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "999.99");
@@ -206,7 +206,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeCalendar() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Calendar.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Calendar.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Calendar.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -217,7 +217,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeDate() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Date.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Date.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Date.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -228,7 +228,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeSqlDate() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", java.sql.Date.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Date.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Date.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -239,7 +239,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeTime() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", java.sql.Time.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Time.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Time.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "20:30:40.000+01:00");
@@ -255,7 +255,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeTimestamp() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", java.sql.Timestamp.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Timestamp.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", java.sql.Timestamp.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "2018-10-01T20:30:40.000Z");
@@ -266,7 +266,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeUUID() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", UUID.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", UUID.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", UUID.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         UUID value = UUID.randomUUID();
@@ -277,7 +277,7 @@ public class IntrospectedPropertyTest {
     @Test
     public void testToTypeCurrency() throws Exception {
         FilterProperty annotation = new MockFilterProperty("name", "col_name", Currency.class);
-        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Currency.class);
+        IntrospectedProperty fixture = new IntrospectedProperty(annotation, "col_name", Currency.class, null);
 
         PreparedStatement statement = spy(PreparedStatement.class);
         fixture.applyTo(statement, 1, "GBP");

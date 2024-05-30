@@ -20,6 +20,7 @@
     <modules>
         <module>query-core</module>
         <module>query-sql</module>
+        <module>query-predicate</module>
     </modules>
 
     <distributionManagement>
@@ -85,6 +86,11 @@
             <dependency>
                 <groupId>com.hillayes</groupId>
                 <artifactId>query-sql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hillayes</groupId>
+                <artifactId>query-predicate</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

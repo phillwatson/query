@@ -20,7 +20,7 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter;
+package com.hillayes.query.filter.function;
 
 /**
  * An enumeration of the function allowed in comparison expressions.
@@ -28,34 +28,12 @@ package com.hillayes.query.filter;
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public enum BiFunction implements Function {
-    CONTAINS, // test if named string property CONTAINS a given string
-    ENDSWITH, // test if named string property ends with a given string
-    STARTSWITH; // test if named string property starts with a given string
+public enum UnaryFunction implements Function {
+    LOWER, // convert named string property to lower-case
+    UPPER; // convert named string property to upper-case
 
     @Override
     public void appendTo(StringBuilder aBuilder, String aColumnName) {
-        aBuilder.append(aColumnName).append(" like ?");
-    }
-
-    /**
-     * Formats the given value, in accordance with the function's rules, in readiness for adding the
-     * a PreparedStatement's arguments.
-     *
-     * @param aValue the value to be formatted.
-     * @return the formatted value.
-     */
-    @Override
-    public String formatValue(String aValue) {
-        if (this == CONTAINS)
-            return "%" + aValue.toLowerCase() + "%";
-
-        if (this == STARTSWITH)
-            return aValue.toLowerCase() + "%";
-
-        if (this == ENDSWITH)
-            return "%" + aValue.toLowerCase();
-
-        return aValue;
+        aBuilder.append(name()).append('(').append(aColumnName).append(')');
     }
 }

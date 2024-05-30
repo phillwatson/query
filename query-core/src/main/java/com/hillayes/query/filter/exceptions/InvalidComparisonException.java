@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.exceptions;
 
-import com.hillayes.query.filter.PredicateExpr;
+import com.hillayes.query.filter.expression.Expression;
 
 /**
  * Raised when the QueryContext deems a Predicate to be invalid.
@@ -31,16 +31,16 @@ import com.hillayes.query.filter.PredicateExpr;
  * @since 1.0.0
  */
 public class InvalidComparisonException extends FilterException {
-    public InvalidComparisonException(PredicateExpr aComparison) {
-        super(ErrorCode.INVALID_COMPARISON);
+    public InvalidComparisonException(Expression aExpression) {
+        super(ErrorCode.INVALID_EXPRESSION);
 
-        getParameters().set("comparison", aComparison);
+        getParameters().set("expression", aExpression);
     }
 
     /**
-     * @return the comparison that is deemed to be invalid.
+     * @return the expression that is deemed to be invalid.
      */
-    public PredicateExpr getComparison() {
-        return getParameters().get("comparison");
+    public Expression getExpression() {
+        return getParameters().get("expression");
     }
 }

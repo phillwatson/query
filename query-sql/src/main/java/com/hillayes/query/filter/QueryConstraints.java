@@ -23,13 +23,9 @@
 package com.hillayes.query.filter;
 
 import com.hillayes.query.filter.exceptions.*;
-import com.hillayes.query.filter.introspection.DataClassQueryContext;
-import com.hillayes.query.filter.introspection.IntrospectedProperty;
-import com.hillayes.query.filter.parser.FilterParser;
-import com.hillayes.query.filter.parser.ParseException;
-import com.hillayes.query.filter.parser.TokenMgrError;
 import com.hillayes.query.filter.util.Strings;
 
+import java.beans.Expression;
 import java.beans.IntrospectionException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,7 +38,7 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public class QueryConstraints {
-    private final DataClassQueryContext context;
+    private final Object context;
 
     private Number skip;
 
@@ -59,7 +55,7 @@ public class QueryConstraints {
      *
      * @param aContext the context describing the data class.
      */
-    public QueryConstraints(DataClassQueryContext aContext) {
+    public QueryConstraints(Object aContext) {
         context = aContext;
     }
 
@@ -179,7 +175,7 @@ public class QueryConstraints {
      * @param aQueryContext the query context with information for the data-class.
      * @throws FilterException if the clause is invalid.
      */
-    private Optional<String> parseOrderBy(QueryContext aQueryContext) throws FilterException {
+    private Optional<String> parseOrderBy(Object aQueryContext) throws FilterException {
         if (!Strings.isEmpty(orderBy)) {
             StringBuilder result = new StringBuilder();
 
@@ -221,16 +217,16 @@ public class QueryConstraints {
         throws SQLException, UnsupportedDataTypeException, IntrospectionException {
         StringBuilder sql = new StringBuilder(aProjection);
 
-        if (filter != null) {
-            try {
-                FilterParser.parse(context, filter);
-                sql.append(" WHERE ").append(context.queryBuilder());
-            } catch (InvalidComparisonException e) {
-                throw new FilterComparisonException(filter, e.getComparison(), e);
-            } catch (ParseException | TokenMgrError e) {
-                throw new FilterExprException(filter, e);
-            }
-        }
+//        if (filter != null) {
+//            try {
+//                FilterParser.parse(context, filter);
+//                sql.append(" WHERE ").append(context.queryBuilder());
+//            } catch (InvalidComparisonException e) {
+//                throw new FilterComparisonException(filter, e.getComparison(), e);
+//            } catch (ParseException | TokenMgrError e) {
+//                throw new FilterExprException(filter, e);
+//            }
+//        }
 
         parseOrderBy(context).ifPresent(sql::append);
 
@@ -259,9 +255,9 @@ public class QueryConstraints {
      */
     public void applyArgs(PreparedStatement aStatement) throws SQLException {
         int argIndex = 1;
-        for (PredicateExpr predicate : context.getPredicates()) {
-            argIndex = applyArg(predicate, aStatement, argIndex);
-        }
+//        for (PredicateExpr predicate : context.getPredicates()) {
+//            argIndex = applyArg(predicate, aStatement, argIndex);
+//        }
     }
 
     /**
@@ -277,20 +273,20 @@ public class QueryConstraints {
      * statement; if a database access error occurs or this method is called on a closed
      * PreparedStatement
      */
-    private int applyArg(PredicateExpr aPredicate, PreparedStatement aStatement, int aArgIndex) throws SQLException {
+    private int applyArg(Expression aPredicate, PreparedStatement aStatement, int aArgIndex) throws SQLException {
         // if the expression references a value
-        if ((aPredicate.getOperator() != null) || (aPredicate.getFunction() instanceof BiFunction)) {
-            // apply the formatted property value to the statement
-            IntrospectedProperty prop = (IntrospectedProperty)aPredicate.getProperty();
-            prop.applyTo(aStatement, aArgIndex++, aPredicate.getValue());
-        }
+//        if ((aPredicate.getOperator() != null) || (aPredicate.getFunction() instanceof BiFunction)) {
+//            // apply the formatted property value to the statement
+//            IntrospectedProperty prop = (IntrospectedProperty)aPredicate.getProperty();
+//            prop.applyTo(aStatement, aArgIndex++, aPredicate.getValue());
+//        }
 
         return aArgIndex;
     }
 
     @Override
     public String toString() {
-        return "QueryConstraints [dataClass=" + context.getClassName()
+        return "QueryConstraints [dataClass=" // + context.getClassName()
             + ", skip=" + skip
             + ", top=" + top
             + ", orderBy=" + orderBy
@@ -320,7 +316,7 @@ public class QueryConstraints {
          * @return the parsed OrderByCol element.
          * @throws FilterException if the $orderby element is not a valid construct.
          */
-        public static Optional<OrderByCol> parse(String aRawData, QueryContext aQueryContext) throws FilterException {
+        public static Optional<OrderByCol> parse(String aRawData, Object aQueryContext) throws FilterException {
             if (Strings.isEmpty(aRawData)) {
                 return Optional.empty();
             }
@@ -333,7 +329,7 @@ public class QueryConstraints {
                 throw new OrderByConstructException(aRawData);
             }
 
-            QueryProperty propInfo = aQueryContext.getPropertyFor(elements[0]);
+            QueryProperty propInfo = null; //aQueryContext.getPropertyFor(elements[0]);
             if (propInfo == null) {
                 throw new InvalidOrderByColException(elements[0]);
             }

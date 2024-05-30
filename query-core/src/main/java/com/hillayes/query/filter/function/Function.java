@@ -1,4 +1,4 @@
-package com.hillayes.query.filter;
+package com.hillayes.query.filter.function;
 
 public interface Function {
     default String formatValue(String aValue) {

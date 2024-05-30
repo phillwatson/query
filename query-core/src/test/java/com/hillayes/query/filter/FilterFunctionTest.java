@@ -22,6 +22,9 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.function.BiFunction;
+import com.hillayes.query.filter.function.BoolFunction;
+import com.hillayes.query.filter.function.UnaryFunction;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

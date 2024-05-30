@@ -22,9 +22,11 @@
  */
 package com.hillayes.query.filter;
 
+import com.hillayes.query.filter.expression.*;
+import com.hillayes.query.filter.function.BiFunction;
+import com.hillayes.query.filter.function.BoolFunction;
+import com.hillayes.query.filter.function.UnaryFunction;
 import com.hillayes.query.filter.parser.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -33,71 +35,69 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
 public class FilterParserTest {
-    private MockQueryContext context;
-
-    @BeforeEach
-    public void init() {
-        context = new MockQueryContext();
-    }
-
-    @AfterEach
-    public void close() {
-        // System.out.println(context.queryBuilder().toString());
-    }
-
     @Test
     public void testNumericLessThan() throws Exception {
-        Node filter = FilterParser.parse(context, "a le 2");
+        Node filter = FilterParser.parse("a le 2");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
+        assertEquals(1, expressions.size());
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("a", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        Expression expression = expressions.get(0);
+        assertInstanceOf(PropertyArgument.class, expression.getLeftArg());
+        assertEquals("a", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
+        assertEquals("2", expression.getRightArg().toString());
     }
 
     @Test
     public void testOperatorCaseInsensitive() throws Exception {
-        Node filter = FilterParser.parse(context, "a LE 2");
+        Node filter = FilterParser.parse("a LE 2");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("a", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+        assertInstanceOf(PropertyArgument.class, expression.getLeftArg());
+        assertEquals("a", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
+        assertEquals("2", expression.getRightArg().toString());
     }
 
     @Test
     public void testDoubleQuotes() throws Exception {
-        Node filter = FilterParser.parse(context, "property LE \"value\"");
+        Node filter = FilterParser.parse("property LE \"value\"");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("value", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+        assertInstanceOf(PropertyArgument.class, expression.getLeftArg());
+        assertEquals("property", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertInstanceOf(StringArgument.class, expression.getRightArg());
+        assertEquals("value", expression.getRightArg().toString());
     }
 
     @Test
     public void testAnd() throws Exception {
-        Node filter = FilterParser.parse(context, "a le 2 and b eq 'xyz'");
+        Node filter = FilterParser.parse("a le 2 and b eq 'xyz'");
         assertNotNull(filter);
 
         // was the AND operator detected
@@ -106,26 +106,29 @@ public class FilterParserTest {
         assertInstanceOf(ASTAnd.class, child);
 
         // where the two comparisons parsed correctly
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(2, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("a", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        assertEquals(2, expressions.size());
 
-        comparison = comparisons.get(1);
-        assertEquals("b", comparison.getName());
-        assertEquals(Operator.EQ, comparison.getOperator());
-        assertEquals("xyz", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        Expression expression = expressions.get(0);
+        assertInstanceOf(PropertyArgument.class, expression.getLeftArg());
+        assertEquals("a", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertEquals("2", expression.getRightArg().toString());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
+
+        expression = expressions.get(1);
+        assertEquals("b", expression.getLeftArg().toString());
+        assertEquals(Operator.EQ, expression.getOperator());
+        assertEquals("xyz", expression.getRightArg().toString());
+        assertInstanceOf(StringArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testMultiAnd() throws Exception {
-        Node filter = FilterParser.parse(context,
-            "property ne 1 and property ne 2 and property ne 3 and property ne 4");
+        Node filter = FilterParser.parse("property ne 1 and property ne 2 and property ne 3 and property ne 4");
         assertNotNull(filter);
 
         // was the AND operator detected
@@ -142,7 +145,7 @@ public class FilterParserTest {
 
     @Test
     public void testOr() throws Exception {
-        Node filter = FilterParser.parse(context, "a le 2 or b eq 'xyz'");
+        Node filter = FilterParser.parse("a le 2 or b eq 'xyz'");
         assertNotNull(filter);
 
         // was the OR operator detected
@@ -151,25 +154,28 @@ public class FilterParserTest {
         assertInstanceOf(ASTOr.class, child);
 
         // where the two comparisons parsed correctly
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(2, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("a", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        assertEquals(2, expressions.size());
 
-        comparison = comparisons.get(1);
-        assertEquals("b", comparison.getName());
-        assertEquals(Operator.EQ, comparison.getOperator());
-        assertEquals("xyz", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        Expression expression = expressions.get(0);
+        assertEquals("a", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertEquals("2", expression.getRightArg().toString());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
+
+        expression = expressions.get(1);
+        assertEquals("b", expression.getLeftArg().toString());
+        assertEquals(Operator.EQ, expression.getOperator());
+        assertEquals("xyz", expression.getRightArg().toString());
+        assertInstanceOf(StringArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testNot() throws Exception {
-        Node filter = FilterParser.parse(context, "not property le 2");
+        Node filter = FilterParser.parse("not property le 2");
         assertNotNull(filter);
 
         // was the NOT operator detected
@@ -178,19 +184,22 @@ public class FilterParserTest {
         assertInstanceOf(ASTNot.class, child);
 
         // was the comparison parsed correctly
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+        assertEquals("property", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertEquals("2", expression.getRightArg().toString());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testNotWithAnd() throws Exception {
-        Node filter = FilterParser.parse(context, "not property le 2 and property gt 4");
+        Node filter = FilterParser.parse("not property le 2 and property gt 4");
         assertNotNull(filter);
 
         // was the NOT operator detected
@@ -211,7 +220,7 @@ public class FilterParserTest {
 
     @Test
     public void testNotComplex() throws Exception {
-        Node filter = FilterParser.parse(context, "not (property le 2 or property gt 4)");
+        Node filter = FilterParser.parse("not (property le 2 or property gt 4)");
         assertNotNull(filter);
 
         // was the NOT operator detected
@@ -232,296 +241,317 @@ public class FilterParserTest {
 
         // where the two comparisons parsed correctly
         ASTComparison lhs = (ASTComparison) orExpression.jjtGetChild(0);
-        PredicateExpr comparison = (PredicateExpr) lhs.jjtGetValue();
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("2", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        Expression expression = (Expression) lhs.jjtGetValue();
+        assertEquals("property", expression.getLeftArg().toString());
+        assertEquals(Operator.LE, expression.getOperator());
+        assertEquals("2", expression.getRightArg().toString());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
 
         ASTComparison rhs = (ASTComparison) orExpression.jjtGetChild(1);
-        comparison = (PredicateExpr) rhs.jjtGetValue();
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.GT, comparison.getOperator());
-        assertEquals("4", comparison.getValue());
-        assertTrue(comparison.isNumeric());
+        expression = (Expression) rhs.jjtGetValue();
+        assertEquals("property", expression.getLeftArg().toString());
+        assertEquals(Operator.GT, expression.getOperator());
+        assertEquals("4", expression.getRightArg().toString());
+        assertInstanceOf(NumericArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testPrecedence() throws Exception {
         // in this expression the AND has precedence - normal logic
-        Node filter = FilterParser.parse(context, "property_1 le 12 AND property_2 eq 1 OR property_3 eq 3");
+        Node filter = FilterParser.parse("property_1 le 12 AND property_2 eq 1 OR property_3 eq 3");
         assertNotNull(filter);
 
         // tree starts with an OR expression
         assertEquals(1, filter.jjtGetNumChildren());
-        Node expression = filter.jjtGetChild(0);
-        assertInstanceOf(ASTOr.class, expression);
+        assertInstanceOf(ASTOr.class, filter.jjtGetChild(0));
 
         // the OR expression has two nodes (AND expression and "property_3 le 3")
-        assertEquals(2, expression.jjtGetNumChildren());
+        assertEquals(2, filter.jjtGetChild(0).jjtGetNumChildren());
 
         // RHS - property comparison "property_3 eq 3"
-        Node comparator = expression.jjtGetChild(1);
+        Node comparator = filter.jjtGetChild(0).jjtGetChild(1);
         assertInstanceOf(ASTComparison.class, comparator);
-        PredicateExpr comparison = (PredicateExpr) ((ASTComparison) comparator).jjtGetValue();
-        assertEquals("property_3", comparison.getName());
+        Expression expression = (Expression) ((ASTComparison) comparator).jjtGetValue();
+        assertEquals("property_3", expression.getLeftArg().toString());
 
         // LHS = the AND expression
-        expression = expression.jjtGetChild(0);
-        assertInstanceOf(ASTAnd.class, expression);
+        ASTAnd andExpr = (ASTAnd) filter.jjtGetChild(0).jjtGetChild(0);
+        assertInstanceOf(ASTAnd.class, andExpr);
 
         // the AND expression has two nodes ("property_1 le 12" and "property_2 eq 1")
-        assertEquals(2, expression.jjtGetNumChildren());
+        assertEquals(2, andExpr.jjtGetNumChildren());
 
         // LHS = property comparison "property_1 le 12"
-        comparator = expression.jjtGetChild(0);
+        comparator = andExpr.jjtGetChild(0);
         assertInstanceOf(ASTComparison.class, comparator);
-        comparison = (PredicateExpr) ((ASTComparison) comparator).jjtGetValue();
-        assertEquals("property_1", comparison.getName());
+        expression = (Expression) ((ASTComparison) comparator).jjtGetValue();
+        assertEquals("property_1", expression.getLeftArg().toString());
 
         // RHS - property comparison "property_2 eq 1"
-        comparator = expression.jjtGetChild(1);
+        comparator = andExpr.jjtGetChild(1);
         assertInstanceOf(ASTComparison.class, comparator);
-        comparison = (PredicateExpr) ((ASTComparison) comparator).jjtGetValue();
-        assertEquals("property_2", comparison.getName());
+        expression = (Expression) ((ASTComparison) comparator).jjtGetValue();
+        assertEquals("property_2", expression.getLeftArg().toString());
     }
 
     @Test
     public void testBracketsPrecedence() throws Exception {
         // in this expression the OR has precedence due to the brackets
-        Node filter = FilterParser.parse(context, "property_1 le 12 AND (property_2 eq 1 OR property_3 eq 3)");
+        Node filter = FilterParser.parse("property_1 le 12 AND (property_2 eq 1 OR property_3 eq 3)");
         assertNotNull(filter);
 
         // tree starts with an AND expression
         assertEquals(1, filter.jjtGetNumChildren());
-        Node expression = filter.jjtGetChild(0);
-        assertInstanceOf(ASTAnd.class, expression);
+        Node andExpr = filter.jjtGetChild(0);
+        assertInstanceOf(ASTAnd.class, andExpr);
 
         // the AND expression has two nodes ("property_1 le 12" and OR expression)
-        assertEquals(2, expression.jjtGetNumChildren());
+        assertEquals(2, andExpr.jjtGetNumChildren());
 
         // LHS = property comparison "property_1 le 12"
-        Node andComparison = expression.jjtGetChild(0);
+        Node andComparison = andExpr.jjtGetChild(0);
         assertInstanceOf(ASTComparison.class, andComparison);
-        PredicateExpr comparison = (PredicateExpr) ((ASTComparison) andComparison).jjtGetValue();
-        assertEquals("property_1", comparison.getName());
+        Expression expression = (Expression) ((ASTComparison) andComparison).jjtGetValue();
+        assertEquals("property_1", expression.getLeftArg().toString());
 
         // RHS = the OR expression enclosed in brackets
-        Node lParen = expression.jjtGetChild(1);
-        expression = lParen.jjtGetChild(0);
-        assertInstanceOf(ASTOr.class, expression);
+        Node lParen = andExpr.jjtGetChild(1);
+        Node orExpr = lParen.jjtGetChild(0);
+        assertInstanceOf(ASTOr.class, orExpr);
 
         // the OR expression has two nodes ("property_2 eq 1" and "property_3 eq 3")
-        assertEquals(2, expression.jjtGetNumChildren());
+        assertEquals(2, orExpr.jjtGetNumChildren());
 
         // LHS - property comparison "property_2 eq 1"
-        Node comparator = expression.jjtGetChild(0);
+        Node comparator = orExpr.jjtGetChild(0);
         assertInstanceOf(ASTComparison.class, comparator);
-        comparison = (PredicateExpr) ((ASTComparison) comparator).jjtGetValue();
-        assertEquals("property_2", comparison.getName());
+        expression = (Expression) ((ASTComparison) comparator).jjtGetValue();
+        assertEquals("property_2", expression.getLeftArg().toString());
 
         // RHS - property comparison "property_3 eq 3"
-        comparator = expression.jjtGetChild(1);
+        comparator = orExpr.jjtGetChild(1);
         assertInstanceOf(ASTComparison.class, comparator);
-        comparison = (PredicateExpr) ((ASTComparison) comparator).jjtGetValue();
-        assertEquals("property_3", comparison.getName());
+        expression = (Expression) ((ASTComparison) comparator).jjtGetValue();
+        assertEquals("property_3", expression.getLeftArg().toString());
     }
 
     @Test
     public void testNotNull() throws Exception {
-        Node filter = FilterParser.parse(context, "notnull(property)");
+        Node filter = FilterParser.parse("notnull(property)");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(BoolFunction.NOTNULL, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertNull(comparison.getOperator());
-        assertNull(comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(BoolFunction.NOTNULL, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
     }
 
     @Test
     public void testIsNull() throws Exception {
-        Node filter = FilterParser.parse(context, "isnull(property)");
+        Node filter = FilterParser.parse("isnull(property)");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(BoolFunction.ISNULL, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertNull(comparison.getOperator());
-        assertNull(comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(BoolFunction.ISNULL, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
     }
 
     @Test
     public void testToLower() throws Exception {
-        Node filter = FilterParser.parse(context, "lower(property) eq 'abc'");
+        Node filter = FilterParser.parse("lower(property) eq 'abc'");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(UnaryFunction.LOWER, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.EQ, comparison.getOperator());
-        assertEquals("abc", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(UnaryFunction.LOWER, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
+
+        assertEquals(Operator.EQ, expression.getOperator());
+        assertEquals("abc", expression.getRightArg().toString());
+        assertInstanceOf(StringArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testToUpper() throws Exception {
-        Node filter = FilterParser.parse(context, "upper(property) le 'abc'");
+        Node filter = FilterParser.parse("upper(property) le 'abc'");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(UnaryFunction.UPPER, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertEquals(Operator.LE, comparison.getOperator());
-        assertEquals("abc", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(UnaryFunction.UPPER, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
+
+        assertEquals(Operator.LE, expression.getOperator());
+        assertEquals("abc", expression.getRightArg().toString());
+        assertInstanceOf(StringArgument.class, expression.getRightArg());
     }
 
     @Test
     public void testContains() throws Exception {
-        Node filter = FilterParser.parse(context, "contains(property, 'abc')");
+        Node filter = FilterParser.parse("contains(property, 'abc')");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(BiFunction.CONTAINS, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertEquals("%abc%", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(BiFunction.CONTAINS, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
+
+        assertInstanceOf(StringArgument.class, functionArg.getArguments().get(1));
+        assertEquals("abc", functionArg.getArguments().get(1).toString());
     }
 
     @Test
     public void testStartsWith() throws Exception {
-        Node filter = FilterParser.parse(context, "startswith(property, 'abc')");
+        Node filter = FilterParser.parse("startswith(property, 'abc')");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(BiFunction.STARTSWITH, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertEquals("abc%", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(BiFunction.STARTSWITH, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
+
+        assertInstanceOf(StringArgument.class, functionArg.getArguments().get(1));
+        assertEquals("abc", functionArg.getArguments().get(1).toString());
     }
 
     @Test
     public void testEndWith() throws Exception {
-        Node filter = FilterParser.parse(context, "endswith(property, 'abc')");
+        Node filter = FilterParser.parse("endswith(property, 'abc')");
         assertNotNull(filter);
 
-        List<PredicateExpr> comparisons = context.getComparisons();
-        assertEquals(1, comparisons.size());
+        ExpressionCollector collector = new ExpressionCollector();
+        filter.jjtAccept(collector, null);
+        List<Expression> expressions = collector.getExpressions();
 
-        PredicateExpr comparison = comparisons.get(0);
-        assertEquals(BiFunction.ENDSWITH, comparison.getFunction());
-        assertEquals("property", comparison.getName());
-        assertEquals("%abc", comparison.getValue());
-        assertFalse(comparison.isNumeric());
+        assertEquals(1, expressions.size());
+
+        Expression expression = expressions.get(0);
+
+        assertInstanceOf(FunctionArgument.class, expression.getLeftArg());
+        FunctionArgument functionArg = expression.getLeftArg();
+        assertEquals(BiFunction.ENDSWITH, functionArg.getFunction());
+
+        assertInstanceOf(PropertyArgument.class, functionArg.getArguments().get(0));
+        assertEquals("property", functionArg.getArguments().get(0).toString());
+
+        assertInstanceOf(StringArgument.class, functionArg.getArguments().get(1));
+        assertEquals("abc", functionArg.getArguments().get(1).toString());
     }
 
     @Test
     public void testEndWithNumeric() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(property, 999)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("endswith(property, 999)"));
     }
 
     @Test
     public void testEndWithIdentifier() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(property, name)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("endswith(property, name)"));
     }
 
     @Test
     public void testFunctionCaseSensitive() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "iSNull(property)"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "NULL(property)"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "EndsWith(property, 'abc')"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "StartsWith(property, 'abc')"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "CONTAINS(property, 'abc')"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "Upper(property) le 'abc')"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "LOWER(property) le 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("iSNull(property)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("NULL(property)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("EndsWith(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("StartsWith(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("CONTAINS(property, 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("Upper(property) le 'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("LOWER(property) le 'abc')"));
     }
 
     @Test
     public void testFunctionMissingParam() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "isnull()"));
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "notnull()"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("isnull()"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("notnull()"));
     }
 
     @Test
     public void testFunctionMissingParamOne() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith(a)"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("endswith(a)"));
     }
 
     @Test
     public void testFunctionMissingParamTwo() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "endswith()"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("endswith()"));
     }
 
     @Test
     public void testInvalidUnaryFunction() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "invalid(property) GT 'abc'"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("invalid(property) GT 'abc'"));
     }
 
     @Test
     public void testInvalidFunction() throws Exception {
-        assertThrows(ParseException.class, () -> FilterParser.parse(context, "invalid(property,'abc')"));
+        assertThrows(ParseException.class, () -> FilterParser.parse("invalid(property,'abc')"));
     }
 
-    /**
-     * A mock implementation of QueryContext to keep a record of the PropertyComparisons generated
-     * during parsing.
-     */
-    private static class MockQueryContext implements QueryContext {
-        private final StringBuilder query = new StringBuilder();
+    private static class ExpressionCollector extends FilterParserDefaultVisitor {
+        List<Expression> expressions = new ArrayList<>();
 
-        private final ArrayList<PredicateExpr> comparisons = new ArrayList<>();
-
-        @Override
-        public String getClassName() {
-            return "mock";
+        public Object visit(ASTComparison node, Object data) {
+            expressions.add((Expression) node.jjtGetValue());
+            return defaultVisit(node, data);
         }
 
-        public List<PredicateExpr> getComparisons() {
-            return comparisons;
-        }
-
-        @Override
-        public PredicateExpr newPredicate() {
-            PredicateExpr result = new PredicateExpr(this);
-            comparisons.add(result);
-
-            return result;
-        }
-
-        @Override
-        public Iterable<? extends PredicateExpr> getPredicates() {
-            return null;
-        }
-
-        @Override
-        public StringBuilder queryBuilder() {
-            return query;
-        }
-
-        @Override
-        public QueryProperty getPropertyFor(String aName) {
-            return new QueryProperty(aName, "colName", String.class);
+        public List<Expression> getExpressions() {
+            return expressions;
         }
     }
 }

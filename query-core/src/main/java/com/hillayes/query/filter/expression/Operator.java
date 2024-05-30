@@ -20,7 +20,7 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter;
+package com.hillayes.query.filter.expression;
 
 /**
  * An enumeration of the comparison operators supported by the filter.
@@ -44,25 +44,5 @@ public enum Operator {
 
     public String getMnemonic() {
         return mnemonic;
-    }
-
-    public boolean test(Object left, Object right) {
-        int result;
-        if (left == null) {
-            result = (right == null) ? 0 : -1;
-        } else if (right == null) {
-            result = 1;
-        } else {
-            result = ((Comparable)left).compareTo(right);
-        }
-
-        return switch (this) {
-            case EQ -> result == 0;
-            case NE -> result != 0;
-            case GT -> result > 0;
-            case LT -> result < 0;
-            case GE -> result >= 0;
-            case LE -> result <= 0;
-        };
     }
 }

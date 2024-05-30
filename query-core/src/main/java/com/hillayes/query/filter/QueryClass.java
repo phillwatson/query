@@ -56,8 +56,7 @@ public class QueryClass implements Queryable {
         return properties.values();
     }
 
-    public Queryable addProperty(String aName, Queryable aProperty) {
+    public void addProperty(String aName, Queryable aProperty) {
         properties.put(aName, aProperty);
-        return aProperty;
     }
 }

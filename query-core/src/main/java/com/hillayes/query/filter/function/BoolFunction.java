@@ -20,46 +20,21 @@
  * ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL
  * ANYTHING THAT IT MAY DESCRIBE, IN WHOLE OR IN PART.
  */
-package com.hillayes.query.filter;
+package com.hillayes.query.filter.function;
 
 /**
- * A QueryContext implementation is passed to the FilterParser to allow the parser to create and
- * validate instances of Predicate to record the comparisons it encounters in the filter expression.
+ * An enumeration of the function allowed in comparison expressions.
  *
  * @author <a href="mailto:watson.phill@gmail.com">Phill Watson</a>
  * @since 1.0.0
  */
-public interface QueryContext {
-    /**
-     * Returns the name of the class for which the query is to be created.
-     */
-    String getClassName();
+public enum BoolFunction implements Function {
+    NOTNULL, // test if named property is NOT null
+    ISNULL; // test if named property is null
 
-    /**
-     * Returns the introspection info for the named property.
-     *
-     * @param aName the property whose info is requested.
-     * @return the named property's info, or <code>null</code> if not found.
-     */
-    QueryProperty getPropertyFor(String aName);
-
-    /**
-     * A factory method to create an instance of Predicate. The implementor can decide whether to
-     * return a sub-class of Predicate that best suits their needs.
-     *
-     * @return a new, empty instance of Predicate.
-     */
-    PredicateExpr newPredicate();
-
-    /**
-     * Returns the list of predicates that have been created during the parsing of the filter.
-     */
-    public Iterable<? extends PredicateExpr> getPredicates();
-
-    /**
-     * Provides access to the StringBuilder used to construct the SQL query during parsing.
-     *
-     * @return the SQL query StringBuilder.
-     */
-    StringBuilder queryBuilder();
+    @Override
+    public void appendTo(StringBuilder aBuilder, String aColumnName) {
+        aBuilder.append(aColumnName).append(" is ")
+            .append(this == NOTNULL ? "not null" : "null");
+    }
 }

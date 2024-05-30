@@ -24,6 +24,12 @@ package com.hillayes.query.filter;
 
 import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.util.*;
+
 /**
  * Represents a property that can be referenced in a filter expression.
  *
@@ -31,6 +37,44 @@ import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
  * @since 1.0.0
  */
 public class QueryProperty implements Queryable {
+    /**
+     * An array of classes that are supported by the filter query. If any other classes are found
+     * during the introspection, a {@link UnsupportedDataTypeException} will be raised.
+     */
+    static final Set<Class<?>> SUPPORTED_TYPES = new HashSet<>();
+
+    static {
+        SUPPORTED_TYPES.add(byte.class);
+        SUPPORTED_TYPES.add(int.class);
+        SUPPORTED_TYPES.add(long.class);
+        SUPPORTED_TYPES.add(float.class);
+        SUPPORTED_TYPES.add(double.class);
+        SUPPORTED_TYPES.add(boolean.class);
+        SUPPORTED_TYPES.add(Byte.class);
+        SUPPORTED_TYPES.add(Integer.class);
+        SUPPORTED_TYPES.add(Long.class);
+        SUPPORTED_TYPES.add(Float.class);
+        SUPPORTED_TYPES.add(Double.class);
+        SUPPORTED_TYPES.add(Boolean.class);
+        SUPPORTED_TYPES.add(BigInteger.class);
+        SUPPORTED_TYPES.add(BigDecimal.class);
+        SUPPORTED_TYPES.add(String.class);
+        SUPPORTED_TYPES.add(Currency.class);
+        SUPPORTED_TYPES.add(UUID.class);
+        SUPPORTED_TYPES.add(Date.class);
+        SUPPORTED_TYPES.add(java.sql.Date.class);
+        SUPPORTED_TYPES.add(java.sql.Time.class);
+        SUPPORTED_TYPES.add(Instant.class);
+        SUPPORTED_TYPES.add(java.sql.Timestamp.class);
+        SUPPORTED_TYPES.add(Calendar.class);
+    }
+
+    public static boolean isSupportedType(Class<?> aClass) {
+        return SUPPORTED_TYPES.contains(aClass);
+    }
+
+    private final Method getterMethod;
+
     // the name of the property as given in the filter expression.
     private final String name;
 
@@ -44,12 +88,14 @@ public class QueryProperty implements Queryable {
      * Constructs a Property instance from the annotation placed of a Bean property getter method,
      * taking the given values as defaults when the annotation does not specify them.
      *
+     * @param aGetterMethod the getter method for the property.
      * @param aName the value for the property name.
      * @param aColName the SQL name of the property.
      * @param aDataType the class for the property's data type.
      * @throws UnsupportedDataTypeException if the give class not of a supported type.
      */
-    public QueryProperty(String aName, String aColName, Class<?> aDataType) {
+    public QueryProperty(Method aGetterMethod, String aName, String aColName, Class<?> aDataType) {
+        getterMethod = aGetterMethod;
         name = aName;
         colName = aColName;
         datatype = aDataType;

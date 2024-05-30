@@ -85,6 +85,10 @@ public class DataTypeTest
 
         assertNotNull(introspection.getProperty("valueA"));
         assertNotNull(introspection.getProperty("boolB"));
+        assertNotNull(introspection.getProperty("valueC"));
+        assertNotNull(introspection.getProperty("boolD"));
+        assertNotNull(introspection.getProperty("valueE"));
+        assertNotNull(introspection.getProperty("boolF"));
     }
 
     @Test
@@ -229,6 +233,30 @@ public class DataTypeTest
         public Boolean isValueB()
         {
             return Boolean.FALSE;
+        }
+
+        @FilterProperty
+        public boolean getValueC()
+        {
+            return false;
+        }
+
+        @FilterProperty(name = "boolD")
+        public Boolean getValueD()
+        {
+            return Boolean.FALSE;
+        }
+
+        @FilterProperty
+        public boolean hasValueE()
+        {
+            return true;
+        }
+
+        @FilterProperty(name = "boolF")
+        public Boolean hasValueF()
+        {
+            return Boolean.TRUE;
         }
     }
 

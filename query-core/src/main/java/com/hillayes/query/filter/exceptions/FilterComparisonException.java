@@ -22,7 +22,7 @@
  */
 package com.hillayes.query.filter.exceptions;
 
-import com.hillayes.query.filter.PredicateExpr;
+import com.hillayes.query.filter.expression.Expression;
 
 /**
  * The '$filter' comparison is not valid for data type.
@@ -31,22 +31,22 @@ import com.hillayes.query.filter.PredicateExpr;
  * @since 28 Aug 2018
  */
 public class FilterComparisonException extends FilterException {
-    public FilterComparisonException(String aFilterExpr, PredicateExpr aComparison) {
-        this(aFilterExpr, aComparison, null);
+    public FilterComparisonException(String aFilterExpr, Expression aExpression) {
+        this(aFilterExpr, aExpression, null);
     }
 
-    public FilterComparisonException(String aFilterExpr, PredicateExpr aComparison, Throwable aCause) {
+    public FilterComparisonException(String aFilterExpr, Expression aExpression, Throwable aCause) {
         super(ErrorCode.INVALID_FILTER_EXPRESSION, aCause);
 
         getParameters().set("filter", aFilterExpr);
-        getParameters().set("comparison", aComparison);
+        getParameters().set("expression", aExpression);
     }
 
     /**
-     * @return the comparison that is deemed to be invalid.
+     * @return the expression that is deemed to be invalid.
      */
-    public PredicateExpr getComparison() {
-        return getParameters().get("comparison");
+    public Expression getExpression() {
+        return getParameters().get("expression");
     }
 
     public String getFilterExpr() {

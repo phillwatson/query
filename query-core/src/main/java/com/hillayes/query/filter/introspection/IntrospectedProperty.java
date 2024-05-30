@@ -27,6 +27,7 @@ import com.hillayes.query.filter.exceptions.UnsupportedDataTypeException;
 import com.hillayes.query.filter.util.Strings;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
@@ -43,43 +44,38 @@ import java.util.*;
  */
 public class IntrospectedProperty extends QueryProperty {
     /**
-     * An array of classes that are supported by the filter query. If any other classes are found
-     * during the introspection, a {@link UnsupportedDataTypeException} will be raised.
-     * <p>
-     * Each class entry has a function ({@link ArgumentSetter}) that can coerce a given string value
-     * to a compatible value for assignment to a given PreparedStatement arguments.
+     * A map of supported classes and the lambda function ({@link ArgumentSetter})
+     * that can coerce a given string value to a compatible value for assignment
+     * to a given PreparedStatement arguments.
      */
-    static final Map<Class<?>, ArgumentSetter> SUPPORTED_TYPES = new HashMap<>();
+    static final Map<Class<?>, ArgumentSetter> SQL_SETTERS = new HashMap<>();
 
     static {
-        SUPPORTED_TYPES.put(byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
-        SUPPORTED_TYPES.put(int.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
-        SUPPORTED_TYPES.put(long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
-        SUPPORTED_TYPES.put(float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
-        SUPPORTED_TYPES.put(double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
-        SUPPORTED_TYPES.put(boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
-        SUPPORTED_TYPES.put(Byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
-        SUPPORTED_TYPES.put(Integer.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
-        SUPPORTED_TYPES.put(Long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
-        SUPPORTED_TYPES.put(Float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
-        SUPPORTED_TYPES.put(Double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
-        SUPPORTED_TYPES.put(Boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
-        SUPPORTED_TYPES.put(BigInteger.class, (p, i, v) -> p.setLong(i, new BigInteger(v).longValue()));
-        SUPPORTED_TYPES.put(BigDecimal.class, (p, i, v) -> p.setBigDecimal(i, new BigDecimal(v)));
-        SUPPORTED_TYPES.put(String.class, PreparedStatement::setString);
-        SUPPORTED_TYPES.put(Currency.class, (p, i, v) -> p.setString(i, Currency.getInstance(v).getCurrencyCode()));
-        SUPPORTED_TYPES.put(UUID.class, (p, i, v) -> p.setObject(i, UUID.fromString(v)));
-        SUPPORTED_TYPES.put(Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
-        SUPPORTED_TYPES.put(java.sql.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
-        SUPPORTED_TYPES.put(java.sql.Time.class, (p, i, v) -> p.setTime(i, java.sql.Time.valueOf(OffsetTime.parse(v).toLocalTime())));
-        SUPPORTED_TYPES.put(Instant.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
-        SUPPORTED_TYPES.put(java.sql.Timestamp.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
-        SUPPORTED_TYPES.put(Calendar.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+        SQL_SETTERS.put(byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
+        SQL_SETTERS.put(int.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
+        SQL_SETTERS.put(long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
+        SQL_SETTERS.put(float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
+        SQL_SETTERS.put(double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
+        SQL_SETTERS.put(boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
+        SQL_SETTERS.put(Byte.class, (p, i, v) -> p.setByte(i, Byte.parseByte(v)));
+        SQL_SETTERS.put(Integer.class, (p, i, v) -> p.setInt(i, Integer.parseInt(v)));
+        SQL_SETTERS.put(Long.class, (p, i, v) -> p.setLong(i, Long.parseLong(v)));
+        SQL_SETTERS.put(Float.class, (p, i, v) -> p.setFloat(i, Float.parseFloat(v)));
+        SQL_SETTERS.put(Double.class, (p, i, v) -> p.setDouble(i, Double.parseDouble(v)));
+        SQL_SETTERS.put(Boolean.class, (p, i, v) -> p.setBoolean(i, Boolean.parseBoolean(v)));
+        SQL_SETTERS.put(BigInteger.class, (p, i, v) -> p.setLong(i, new BigInteger(v).longValue()));
+        SQL_SETTERS.put(BigDecimal.class, (p, i, v) -> p.setBigDecimal(i, new BigDecimal(v)));
+        SQL_SETTERS.put(String.class, PreparedStatement::setString);
+        SQL_SETTERS.put(Currency.class, (p, i, v) -> p.setString(i, Currency.getInstance(v).getCurrencyCode()));
+        SQL_SETTERS.put(UUID.class, (p, i, v) -> p.setObject(i, UUID.fromString(v)));
+        SQL_SETTERS.put(Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+        SQL_SETTERS.put(java.sql.Date.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
+        SQL_SETTERS.put(java.sql.Time.class, (p, i, v) -> p.setTime(i, java.sql.Time.valueOf(OffsetTime.parse(v).toLocalTime())));
+        SQL_SETTERS.put(Instant.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
+        SQL_SETTERS.put(java.sql.Timestamp.class, (p, i, v) -> p.setTimestamp(i, java.sql.Timestamp.from(Instant.parse(v))));
+        SQL_SETTERS.put(Calendar.class, (p, i, v) -> p.setDate(i, new java.sql.Date(Instant.parse(v).toEpochMilli())));
     }
 
-    public static boolean isSupportedType(Class<?> aClass) {
-        return SUPPORTED_TYPES.containsKey(aClass);
-    }
     /**
      * Constructs a Property instance from the given property values derived from the introspection
      * of a Bean property, and the annotation placed on the Bean property getter method.
@@ -89,7 +85,7 @@ public class IntrospectedProperty extends QueryProperty {
      * @throws UnsupportedDataTypeException if the give class not of a supported type.
      */
     IntrospectedProperty(PropertyDescriptor aDescriptor, FilterProperty aAnnotation) {
-        this(aAnnotation, aDescriptor.getName(), aDescriptor.getPropertyType());
+        this(aAnnotation, aDescriptor.getName(), aDescriptor.getPropertyType(), aDescriptor.getReadMethod());
     }
 
     /**
@@ -101,10 +97,14 @@ public class IntrospectedProperty extends QueryProperty {
      * @param aDefaultType the default class for the property's data type.
      * @throws UnsupportedDataTypeException if the give class not of a supported type.
      */
-    IntrospectedProperty(FilterProperty aAnnotation, String aDefaultName, Class<?> aDefaultType) {
-        super(Strings.isEmpty(aAnnotation.name()) ? aDefaultName : aAnnotation.name(),
-             Strings.isEmpty(aAnnotation.colname()) ? aDefaultName : aAnnotation.colname(),
-             (aAnnotation.type() == Void.class) ? aDefaultType : aAnnotation.type());
+    IntrospectedProperty(FilterProperty aAnnotation,
+                         String aDefaultName,
+                         Class<?> aDefaultType,
+                         Method aGetterMethod) {
+        super(aGetterMethod,
+            Strings.isEmpty(aAnnotation.name()) ? aDefaultName : aAnnotation.name(),
+            Strings.isEmpty(aAnnotation.colname()) ? aDefaultName : aAnnotation.colname(),
+            (aAnnotation.type() == Void.class) ? aDefaultType : aAnnotation.type());
 
         if (! isSupportedType(getDatatype())) {
             throw new UnsupportedDataTypeException(getDatatype());
@@ -123,7 +123,7 @@ public class IntrospectedProperty extends QueryProperty {
      *     PreparedStatement
      */
     public void applyTo(PreparedStatement aStatement, int aArgIndex, String aValue) throws SQLException {
-        IntrospectedProperty.SUPPORTED_TYPES.get(getDatatype())
+        IntrospectedProperty.SQL_SETTERS.get(getDatatype())
             .setArg(aStatement, aArgIndex, aValue);
     }
 
